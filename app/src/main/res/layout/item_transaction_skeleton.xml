@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="?attr/colorSurfaceTicket"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1.5dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header (票頭: 16dp horizontal, 12dp vertical) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <!-- Date Skeleton -->
+            <View
+                android:id="@+id/viewSkeletonDate"
+                android:layout_width="36dp"
+                android:layout_height="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Partner Name Skeleton -->
+            <View
+                android:id="@+id/viewSkeletonPartner"
+                android:layout_width="60dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="@id/viewSkeletonDate"
+                app:layout_constraintStart_toEndOf="@id/viewSkeletonDate"
+                app:layout_constraintTop_toTopOf="@id/viewSkeletonDate" />
+
+            <!-- Balance Skeleton -->
+            <View
+                android:id="@+id/viewSkeletonBalance"
+                android:layout_width="40dp"
+                android:layout_height="11dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/viewSkeletonAmount"
+                app:layout_constraintEnd_toStartOf="@id/viewSkeletonAmount"
+                app:layout_constraintTop_toTopOf="@id/viewSkeletonAmount" />
+
+            <!-- Amount Skeleton -->
+            <View
+                android:id="@+id/viewSkeletonAmount"
+                android:layout_width="44dp"
+                android:layout_height="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Dashed Divider (折線: 1dp height, 16dp margins) -->
+        <com.jasonhong.yoyu.core.widgets.DashedDividerView
+            android:id="@+id/dashedDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:alpha="0.4" />
+
+        <!-- Body (票面: 3 Column 絕對網格對齊，16dp padding) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+
+            <!-- Column 1: Graphic (Fixed 30dp width, 40dp height) -->
+            <LinearLayout
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:gravity="start"
+                android:orientation="vertical">
+
+                <!-- Top Circle (8dp x 8dp) -->
+                <View
+                    android:id="@+id/viewSkeletonTopDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp" />
+
+                <!-- Middle Line Segment (2dp width, 16dp height, 4dp gaps, 3dp start margin) -->
+                <View
+                    android:id="@+id/viewSkeletonTrackLine"
+                    android:layout_width="2dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:alpha="0.4"
+                    android:background="@color/primary_track" />
+
+                <!-- Bottom Circle (8dp x 8dp) -->
+                <View
+                    android:id="@+id/viewSkeletonBottomDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp" />
+
+            </LinearLayout>
+
+            <!-- Column 2: Locations (Expanded width, 42dp height, vertical spaceBetween) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/viewSkeletonInLocation"
+                    android:layout_width="100dp"
+                    android:layout_height="15dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <View
+                    android:id="@+id/viewSkeletonOutLocation"
+                    android:layout_width="72dp"
+                    android:layout_height="15dp" />
+
+            </LinearLayout>
+
+            <!-- Column 3: Times (Fixed 50dp width, 42dp height, vertical spaceBetween) -->
+            <LinearLayout
+                android:layout_width="50dp"
+                android:layout_height="42dp"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/viewSkeletonInTime"
+                    android:layout_width="36dp"
+                    android:layout_height="12dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <View
+                    android:id="@+id/viewSkeletonOutTime"
+                    android:layout_width="36dp"
+                    android:layout_height="12dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

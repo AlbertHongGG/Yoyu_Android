@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.jasonhong.yoyu.core.base.Resource;
 import com.jasonhong.yoyu.core.widgets.NotificationToast;
 import com.jasonhong.yoyu.databinding.FragmentTransactionHistoryBinding;
+import com.jasonhong.yoyu.domain.model.YoyuTransaction;
+
+import java.util.List;
 
 /**
  * Fragment responsible for displaying the transaction history list and handling pull-to-refresh.
@@ -52,14 +55,28 @@ public class TransactionHistoryFragment extends Fragment {
     private void observeViewModel() {
         viewModel.getRawTransactionsResource().observe(getViewLifecycleOwner(), res -> {
             if (res == null) return;
-            if (res.getStatus() == Resource.Status.ERROR && res.getMessage() != null && getContext() != null) {
-                NotificationToast.showError(requireActivity(), res.getMessage());
+            if (res.getStatus() == Resource.Status.LOADING) {
+                adapter.setLoading(true);
+                binding.tvTransactionsEmpty.setVisibility(View.GONE);
+            } else if (res.getStatus() == Resource.Status.SUCCESS) {
+                adapter.setLoading(false);
+                List<YoyuTransaction> currentList = viewModel.getFilteredTransactions().getValue();
+                binding.tvTransactionsEmpty.setVisibility((currentList == null || currentList.isEmpty()) ? View.VISIBLE : View.GONE);
+            } else if (res.getStatus() == Resource.Status.ERROR) {
+                adapter.setLoading(false);
+                if (res.getMessage() != null && getContext() != null) {
+                    NotificationToast.showError(requireActivity(), res.getMessage());
+                }
             }
         });
 
         viewModel.getFilteredTransactions().observe(getViewLifecycleOwner(), list -> {
             adapter.submitList(list);
-            binding.tvTransactionsEmpty.setVisibility((list == null || list.isEmpty()) ? View.VISIBLE : View.GONE);
+            if (!adapter.isLoading()) {
+                binding.tvTransactionsEmpty.setVisibility((list == null || list.isEmpty()) ? View.VISIBLE : View.GONE);
+            } else {
+                binding.tvTransactionsEmpty.setVisibility(View.GONE);
+            }
         });
     }
 
