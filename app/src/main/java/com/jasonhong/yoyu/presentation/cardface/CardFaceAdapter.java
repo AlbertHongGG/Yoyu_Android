@@ -1,5 +1,7 @@
 package com.jasonhong.yoyu.presentation.cardface;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.Rotate;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.jasonhong.yoyu.R;
+import com.facebook.shimmer.ShimmerDrawable;
+import com.jasonhong.yoyu.core.widgets.ShimmerHelper;
 import com.jasonhong.yoyu.databinding.ItemCardFaceBinding;
 
 import java.util.ArrayList;
@@ -69,14 +71,14 @@ public class CardFaceAdapter extends RecyclerView.Adapter<CardFaceAdapter.CardFa
             boolean isSelected = url.equals(selectedUrl);
             binding.layoutSelectedOverlay.setVisibility(isSelected ? View.VISIBLE : View.GONE);
 
-            // Rotate 90 degrees to show landscape card images as portrait!
-            int radius = (int) (16 * itemView.getResources().getDisplayMetrics().density + 0.5f);
+            ShimmerDrawable shimmer = ShimmerHelper.createMetallicShimmer(itemView.getContext());
+
             Glide.with(itemView.getContext())
                     .load(url)
-                    .transform(new Rotate(90), new CenterCrop(), new RoundedCorners(radius))
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .placeholder(R.drawable.logo)
-                    .error(R.drawable.logo)
+                    .transform(new Rotate(90), new CenterCrop())
+                    .transition(DrawableTransitionOptions.withCrossFade(200))
+                    .placeholder(shimmer)
+                    .error(new ColorDrawable(Color.parseColor("#33888888")))
                     .into(binding.ivFace);
 
             binding.cardFaceContainer.setOnClickListener(v -> {

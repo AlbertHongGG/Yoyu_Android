@@ -1,6 +1,7 @@
 package com.jasonhong.yoyu.presentation.home;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.jasonhong.yoyu.core.widgets.NotificationToast;
 import com.jasonhong.yoyu.databinding.DialogAddCardBinding;
+import com.jasonhong.yoyu.domain.model.CardEntity;
 
 public class AddCardBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -51,29 +54,16 @@ public class AddCardBottomSheetDialog extends BottomSheetDialogFragment {
 
         binding.btnSubmit.setOnClickListener(v -> submit());
 
-        viewModel.getAddCardLiveData().observe(getViewLifecycleOwner(), resource -> {
-            if (resource == null) return;
-            switch (resource.status) {
-                case LOADING:
-                    binding.btnSubmit.setVisibility(View.GONE);
-                    binding.pbLoading.setVisibility(View.VISIBLE);
-                    binding.etCardNo.setEnabled(false);
-                    binding.etCardName.setEnabled(false);
-                    break;
-                case SUCCESS:
-                    binding.pbLoading.setVisibility(View.GONE);
-                    NotificationToast.showSuccess(requireActivity(), "新增卡片成功");
-                    dismiss();
-                    break;
-                case ERROR:
-                    binding.pbLoading.setVisibility(View.GONE);
-                    binding.btnSubmit.setVisibility(View.VISIBLE);
-                    binding.etCardNo.setEnabled(true);
-                    binding.etCardName.setEnabled(true);
-                    NotificationToast.showError(requireActivity(), resource.message != null ? resource.message : "新增失敗");
-                    break;
+        // Auto focus card number field
+        binding.etCardNo.requestFocus();
+        binding.etCardNo.postDelayed(() -> {
+            if (getContext() != null) {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.showSoftInput(binding.etCardNo, InputMethodManager.SHOW_IMPLICIT);
+                }
             }
-        });
+        }, 150);
     }
 
     private void submit() {
@@ -85,7 +75,29 @@ public class AddCardBottomSheetDialog extends BottomSheetDialogFragment {
             return;
         }
 
-        viewModel.addCard(cardNo, cardName);
+        binding.btnSubmit.setVisibility(View.GONE);
+        binding.pbLoading.setVisibility(View.VISIBLE);
+        binding.etCardNo.setEnabled(false);
+        binding.etCardName.setEnabled(false);
+
+        viewModel.addCard(cardNo, cardName, new HomeViewModel.AddCardCallback() {
+            @Override
+            public void onSuccess(CardEntity card) {
+                if (getContext() == null) return;
+                NotificationToast.showSuccess(requireActivity(), "新增卡片成功");
+                dismiss();
+            }
+
+            @Override
+            public void onError(String message) {
+                if (getContext() == null) return;
+                binding.pbLoading.setVisibility(View.GONE);
+                binding.btnSubmit.setVisibility(View.VISIBLE);
+                binding.etCardNo.setEnabled(true);
+                binding.etCardName.setEnabled(true);
+                NotificationToast.showError(requireActivity(), message != null ? message : "新增失敗");
+            }
+        });
     }
 
     @Override

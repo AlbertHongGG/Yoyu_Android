@@ -98,9 +98,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String amtStr = (amt > 0 ? "+" : "") + amt;
             binding.tvAmount.setText(amtStr);
 
-            int colorRes = amt < 0 ? R.color.expense_red : (amt > 0 ? R.color.success_green : R.color.text_primary_light);
+            boolean isDark = (itemView.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            int colorRes = amt < 0 ? R.color.tx_expense_red : (amt > 0 ? R.color.tx_income_green : (isDark ? R.color.text_primary_dark : R.color.tx_zero_black));
             binding.tvAmount.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
 
+            binding.trackView.setMode(com.jasonhong.yoyu.core.widgets.TransitTrackView.MODE_TRANSIT);
             binding.tvInLocation.setText(tx.getInLocation());
             binding.tvOutLocation.setText(tx.getOutLocation());
 
@@ -126,9 +128,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String amtStr = (amt > 0 ? "+" : "") + amt;
             binding.tvAmount.setText(amtStr);
 
-            int colorRes = amt < 0 ? R.color.expense_red : (amt > 0 ? R.color.success_green : R.color.text_primary_light);
+            boolean isDark = (itemView.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            int colorRes = amt < 0 ? R.color.tx_expense_red : (amt > 0 ? R.color.tx_income_green : (isDark ? R.color.text_primary_dark : R.color.tx_zero_black));
             binding.tvAmount.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
 
+            binding.trackView.setMode(com.jasonhong.yoyu.core.widgets.TransitTrackView.MODE_RETAIL);
             String desc = (tx.getLocation() + " " + tx.getDescription()).trim();
             binding.tvDescription.setText(desc);
             binding.tvTime.setText(timeFormat.format(tx.getTime()));

@@ -91,6 +91,7 @@ public class AnalysisCategoryAdapter extends RecyclerView.Adapter<AnalysisCatego
 
             int color = ContextCompat.getColor(itemView.getContext(), colorRes);
             ImageViewCompat.setImageTintList(binding.ivCategoryIcon, ColorStateList.valueOf(color));
+            binding.layoutIconContainer.setBackgroundTintList(ColorStateList.valueOf(androidx.core.graphics.ColorUtils.setAlphaComponent(color, 38)));
 
             int progress = totalAmount > 0 ? (int) Math.round((model.getAmount() * 100.0) / totalAmount) : 0;
             binding.pbCategoryProgress.setProgress(progress);

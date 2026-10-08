@@ -11,13 +11,14 @@
     android:foreground="?attr/selectableItemBackground"
     app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="16dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:cardPreventCornerOverlap="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Aspect Ratio 0.63 -> Width:Height = 63:100 (or height / width = 1.587) -->
+        <!-- Aspect Ratio 0.63 -> Width:Height = 63:100 (matches Flutter 0.63 childAspectRatio) -->
         <ImageView
             android:id="@+id/ivFace"
             android:layout_width="0dp"
@@ -26,8 +27,7 @@
             app:layout_constraintDimensionRatio="63:100"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/logo" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Selected Overlay -->
         <FrameLayout

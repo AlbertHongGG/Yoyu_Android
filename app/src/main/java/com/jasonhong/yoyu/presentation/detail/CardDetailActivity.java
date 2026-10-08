@@ -102,7 +102,7 @@ public class CardDetailActivity extends BaseActivity<ActivityCardDetailBinding> 
             } else {
                 binding.layoutTitle.setVisibility(View.VISIBLE);
                 binding.tvSearchTitle.setVisibility(View.GONE);
-                binding.btnSearch.setImageResource(R.drawable.ic_search);
+                binding.btnSearch.setImageResource(R.drawable.ic_search_rounded);
             }
         });
 

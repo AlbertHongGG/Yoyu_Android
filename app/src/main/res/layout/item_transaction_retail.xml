@@ -5,16 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="?attr/colorSurface"
+    app:cardBackgroundColor="?attr/colorSurfaceTicket"
     app:cardCornerRadius="16dp"
-    app:cardElevation="2dp">
+    app:cardElevation="1.5dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header (票頭) -->
+        <!-- Header (票頭: 16dp horizontal, 12dp vertical) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,9 +39,8 @@
                     android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="@color/text_secondary_light"
                     android:textSize="12sp"
-                    android:textStyle="bold"
                     tools:text="09/24" />
 
                 <TextView
@@ -49,24 +50,24 @@
                     android:layout_marginStart="8dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="@color/primary"
+                    android:textColor="@color/primary_subtle"
                     android:textSize="12sp"
                     tools:text="全家便利商店" />
 
             </LinearLayout>
 
-            <!-- Balance & Amount -->
+            <!-- Amount & Balance (Aligned Baseline) -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
+                android:baselineAligned="true"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvBalance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="@color/text_hint_light"
                     android:textSize="11sp"
                     tools:text="餘 $500" />
 
@@ -75,24 +76,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
+                    android:fontFamily="@font/font_outfit"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     tools:text="+500"
-                    tools:textColor="@color/success_green" />
+                    tools:textColor="@color/tx_income_green" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Dashed Divider -->
+        <!-- Dashed Divider (折線) -->
         <com.jasonhong.yoyu.core.widgets.DashedDividerView
             android:id="@+id/dashedDivider"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
+            android:layout_height="1dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" />
 
-        <!-- Body (單點消費/加值) -->
+        <!-- Body (單點消費/加值: 16dp padding) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,18 +105,11 @@
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Graphic Point (30dp) -->
-            <FrameLayout
+            <!-- Graphic Point (Fixed 30dp, start-aligned, 20dp height) -->
+            <com.jasonhong.yoyu.core.widgets.TransitTrackView
+                android:id="@+id/trackView"
                 android:layout_width="30dp"
-                android:layout_height="wrap_content">
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/bg_track_circle_solid" />
-
-            </FrameLayout>
+                android:layout_height="20dp" />
 
             <!-- Location & Description -->
             <TextView
@@ -123,19 +118,21 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ellipsize="end"
+                android:includeFontPadding="false"
                 android:maxLines="1"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 tools:text="台北車站 加值" />
 
-            <!-- Time -->
+            <!-- Time (Fixed 50dp) -->
             <TextView
                 android:id="@+id/tvTime"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
                 android:gravity="end"
+                android:includeFontPadding="false"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="12sp"
                 tools:text="18:27" />

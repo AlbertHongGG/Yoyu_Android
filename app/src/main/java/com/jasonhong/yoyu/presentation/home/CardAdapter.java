@@ -1,7 +1,9 @@
 package com.jasonhong.yoyu.presentation.home;
 
 import android.content.ClipData;
-import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.jasonhong.yoyu.R;
+import com.facebook.shimmer.ShimmerDrawable;
+import com.jasonhong.yoyu.core.widgets.ShimmerHelper;
 import com.jasonhong.yoyu.databinding.ItemCardBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
 
@@ -103,13 +106,14 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
             binding.tagRegistered.setVisibility(card.isRegister() ? View.VISIBLE : View.GONE);
 
-            // Load Card Face
+            // Load Card Face with metallic shimmer
+            ShimmerDrawable shimmer = ShimmerHelper.createMetallicShimmer(itemView.getContext());
             Glide.with(itemView.getContext())
                     .load(card.getCardFaceUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .transition(DrawableTransitionOptions.withCrossFade(200))
                     .centerCrop()
-                    .placeholder(R.drawable.logo)
-                    .error(R.drawable.logo)
+                    .placeholder(shimmer)
+                    .error(new ColorDrawable(android.graphics.Color.parseColor("#33888888")))
                     .into(binding.ivCardFace);
 
             binding.cardContainer.setOnClickListener(v -> {
@@ -126,7 +130,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                     listener.onCardDragStart(card);
                 }
                 ClipData data = ClipData.newPlainText("cardNo", card.getCardNo());
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(itemView);
+                View.DragShadowBuilder shadowBuilder = new CardDragShadowBuilder(itemView);
+                itemView.setAlpha(0.2f);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     v.startDragAndDrop(data, shadowBuilder, card, 0);
                 } else {
@@ -146,6 +151,34 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 sb.append(rawNo.charAt(i));
             }
             return sb.toString();
+        }
+    }
+
+    public static class CardDragShadowBuilder extends View.DragShadowBuilder {
+        public CardDragShadowBuilder(View view) {
+            super(view);
+        }
+
+        @Override
+        public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
+            View view = getView();
+            if (view == null) return;
+            int width = (int) (view.getWidth() * 1.05f);
+            int height = (int) (view.getHeight() * 1.05f);
+            outShadowSize.set(width, height);
+            outShadowTouchPoint.set(width / 2, height / 2);
+        }
+
+        @Override
+        public void onDrawShadow(Canvas canvas) {
+            View view = getView();
+            if (view == null) return;
+            canvas.save();
+            canvas.scale(1.05f, 1.05f);
+            view.setAlpha(0.85f);
+            view.draw(canvas);
+            view.setAlpha(0.2f);
+            canvas.restore();
         }
     }
 }

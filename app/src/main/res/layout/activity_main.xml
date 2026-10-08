@@ -9,6 +9,7 @@
     <!-- Top App Bar Title -->
     <TextView
         android:id="@+id/tvAppTitle"
+        style="@style/TextAppearance.Yoyu.Headline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -16,10 +17,7 @@
         android:paddingTop="20dp"
         android:paddingEnd="20dp"
         android:paddingBottom="12dp"
-        android:text="@string/title_home"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:text="@string/title_home" />
 
     <!-- Swipe Refresh & Cards List -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -68,21 +66,18 @@
         </FrameLayout>
 
         <TextView
+            style="@style/TextAppearance.Yoyu.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/no_cards_title"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:text="@string/no_cards_title" />
 
         <TextView
+            style="@style/TextAppearance.Yoyu.Subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/no_cards_subtitle"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="14sp" />
+            android:text="@string/no_cards_subtitle" />
 
     </LinearLayout>
 

@@ -1,6 +1,9 @@
 package com.jasonhong.yoyu.presentation.home;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -16,9 +19,14 @@ import java.util.List;
 
 public class HomeViewModel extends AndroidViewModel {
 
+    public interface AddCardCallback {
+        void onSuccess(CardEntity card);
+        void onError(String message);
+    }
+
     private final CardRepository cardRepository;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<Resource<List<CardEntity>>> cardsLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Resource<CardEntity>> addCardLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isDraggingLiveData = new MutableLiveData<>(false);
 
     public HomeViewModel(@NonNull Application application) {
@@ -29,10 +37,6 @@ public class HomeViewModel extends AndroidViewModel {
 
     public LiveData<Resource<List<CardEntity>>> getCardsLiveData() {
         return cardsLiveData;
-    }
-
-    public LiveData<Resource<CardEntity>> getAddCardLiveData() {
-        return addCardLiveData;
     }
 
     public LiveData<Boolean> getIsDraggingLiveData() {
@@ -73,18 +77,20 @@ public class HomeViewModel extends AndroidViewModel {
                 });
     }
 
-    public void addCard(String cardNo, String cardName) {
-        addCardLiveData.postValue(Resource.loading());
+    public void addCard(String cardNo, String cardName, AddCardCallback callback) {
         cardRepository.addCard(cardNo, cardName)
                 .thenAccept(newCard -> {
-                    addCardLiveData.postValue(Resource.success(newCard));
-                    // Refresh cards list
                     cardRepository.loadCards().thenAccept(list -> cardsLiveData.postValue(Resource.success(list)));
+                    if (callback != null) {
+                        mainHandler.post(() -> callback.onSuccess(newCard));
+                    }
                 })
                 .exceptionally(throwable -> {
                     Throwable cause = throwable.getCause() != null ? throwable.getCause() : throwable;
                     String msg = cause.getMessage() != null ? cause.getMessage() : "新增失敗";
-                    addCardLiveData.postValue(Resource.error(msg));
+                    if (callback != null) {
+                        mainHandler.post(() -> callback.onError(msg));
+                    }
                     return null;
                 });
     }
@@ -99,14 +105,14 @@ public class HomeViewModel extends AndroidViewModel {
     public void updateCardFace(String cardNo, String newFaceUrl) {
         cardRepository.loadCards()
                 .thenAccept(cards -> {
-                    for (CardEntity c : cards) {
-                        if (c.getCardNo().equals(cardNo)) {
-                            CardEntity updated = c.copyWithCardFaceUrl(newFaceUrl);
-                            cardRepository.updateCard(updated).join();
+                    for (int i = 0; i < cards.size(); i++) {
+                        if (cards.get(i).getCardNo().equals(cardNo)) {
+                            cards.set(i, cards.get(i).copyWithCardFaceUrl(newFaceUrl));
                             break;
                         }
                     }
-                    cardRepository.loadCards().thenAccept(list -> cardsLiveData.postValue(Resource.success(list)));
+                    cardRepository.saveCards(cards).join();
+                    cardsLiveData.postValue(Resource.success(cards));
                 });
     }
 }

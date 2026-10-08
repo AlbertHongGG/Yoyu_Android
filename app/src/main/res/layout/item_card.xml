@@ -5,13 +5,14 @@
     android:id="@+id/cardContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="20dp"
+    android:layout_marginBottom="24dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="?attr/colorSurface"
+    app:cardBackgroundColor="?attr/colorSurfaceCard"
     app:cardCornerRadius="24dp"
-    app:cardElevation="6dp">
+    app:cardElevation="6dp"
+    app:cardPreventCornerOverlap="false">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,10 +71,10 @@
                 android:background="@drawable/bg_registered_tag"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingTop="3dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="3dp"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="4dp"
                 android:visibility="gone"
                 tools:visibility="visible">
 
@@ -81,7 +82,7 @@
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:src="@drawable/ic_verified"
-                    app:tint="@color/success_green" />
+                    app:tint="@color/verified_green" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -115,13 +116,11 @@
 
                 <TextView
                     android:id="@+id/tvCardName"
+                    style="@style/TextAppearance.Yoyu.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
                     tools:text="我的卡片" />
 
                 <LinearLayout
@@ -139,13 +138,10 @@
 
                     <TextView
                         android:id="@+id/tvCardNo"
+                        style="@style/TextAppearance.Yoyu.Mono"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:fontFamily="monospace"
-                        android:letterSpacing="0.08"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:textSize="12sp"
                         tools:text="7705 0067 379" />
 
                 </LinearLayout>
@@ -154,12 +150,10 @@
 
             <TextView
                 android:id="@+id/tvCardBalance"
+                style="@style/TextAppearance.Yoyu.Amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:textColor="@color/primary"
-                android:textSize="26sp"
-                android:textStyle="bold"
                 tools:text="$31" />
 
         </LinearLayout>

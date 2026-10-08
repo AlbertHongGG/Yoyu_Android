@@ -1,25 +1,31 @@
 package com.jasonhong.yoyu.core.widgets;
 
-import android.animation.ValueAnimator;
+import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import com.jasonhong.yoyu.R;
 
+/**
+ * Pixel-perfect reproduction of Flutter's AnimatedFloatingTabBar:
+ * Floating pill bar (30dp radius, 6dp padding, soft shadow).
+ * Items:
+ * - Selected: 26dp radius pill (#1A475D8E), Icon + Text, primary color (#475D8E).
+ * - Unselected: Transparent, Text COLLAPSED (Gone), ONLY Icon (20dp, #757575).
+ * Icons: ic_list_alt_rounded & ic_pie_chart_outline_rounded.
+ */
 public class AnimatedFloatingTabBar extends LinearLayout {
 
     public interface OnTabSelectedListener {
@@ -56,18 +62,24 @@ public class AnimatedFloatingTabBar extends LinearLayout {
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER);
         setBackgroundResource(R.drawable.bg_floating_tab_bar);
-        setElevation(16f);
+        setElevation(dpToPx(8));
+
+        // Enable smooth expanding / collapsing transition
+        LayoutTransition transition = new LayoutTransition();
+        transition.enableTransitionType(LayoutTransition.CHANGING);
+        transition.setDuration(250);
+        setLayoutTransition(transition);
 
         int pad = dpToPx(6);
         setPadding(pad, pad, pad, pad);
 
-        // Tab 0: 交易紀錄
-        tab0 = createTabItem(context, R.drawable.ic_list, "交易紀錄");
+        // Tab 0: 交易紀錄 (ic_list_alt_rounded)
+        tab0 = createTabItem(context, R.drawable.ic_list_alt_rounded, "交易紀錄");
         icon0 = (ImageView) tab0.getChildAt(0);
         label0 = (TextView) tab0.getChildAt(1);
 
-        // Tab 1: 分析
-        tab1 = createTabItem(context, R.drawable.ic_pie_chart, "分析");
+        // Tab 1: 分析 (ic_pie_chart_outline_rounded)
+        tab1 = createTabItem(context, R.drawable.ic_pie_chart_outline_rounded, "分析");
         icon1 = (ImageView) tab1.getChildAt(0);
         label1 = (TextView) tab1.getChildAt(1);
 
@@ -77,7 +89,7 @@ public class AnimatedFloatingTabBar extends LinearLayout {
         tab0.setOnClickListener(v -> setSelectedIndex(0, true));
         tab1.setOnClickListener(v -> setSelectedIndex(1, true));
 
-        updateTabState(false);
+        updateTabState();
     }
 
     public void setOnTabSelectedListener(OnTabSelectedListener listener) {
@@ -91,7 +103,7 @@ public class AnimatedFloatingTabBar extends LinearLayout {
     public void setSelectedIndex(int index, boolean notify) {
         if (this.selectedIndex == index) return;
         this.selectedIndex = index;
-        updateTabState(true);
+        updateTabState();
         if (notify && listener != null) {
             listener.onTabSelected(index);
         }
@@ -105,7 +117,6 @@ public class AnimatedFloatingTabBar extends LinearLayout {
         LinearLayout item = new LinearLayout(context);
         item.setOrientation(HORIZONTAL);
         item.setGravity(Gravity.CENTER);
-        item.setPadding(dpToPx(16), dpToPx(10), dpToPx(16), dpToPx(10));
 
         ImageView icon = new ImageView(context);
         icon.setImageResource(iconRes);
@@ -130,23 +141,26 @@ public class AnimatedFloatingTabBar extends LinearLayout {
         return item;
     }
 
-    private void updateTabState(boolean animate) {
+    private void updateTabState() {
+        boolean isDark = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         int primaryColor = ContextCompat.getColor(getContext(), R.color.primary);
-        int unselectedColor = ContextCompat.getColor(getContext(), R.color.text_secondary_light);
+        int unselectedColor = ContextCompat.getColor(getContext(), isDark ? R.color.text_secondary_dark : R.color.text_secondary_light);
 
-        // Apply Tab 0
-        boolean isTab0Selected = selectedIndex == 0;
-        tab0.setBackgroundResource(isTab0Selected ? R.drawable.bg_floating_tab_selected : 0);
-        ImageViewCompat.setImageTintList(icon0, ColorStateList.valueOf(isTab0Selected ? primaryColor : unselectedColor));
+        // Tab 0
+        boolean is0 = selectedIndex == 0;
+        tab0.setBackgroundResource(is0 ? R.drawable.bg_floating_tab_selected : 0);
+        tab0.setPadding(dpToPx(is0 ? 20 : 16), dpToPx(10), dpToPx(is0 ? 20 : 16), dpToPx(10));
+        ImageViewCompat.setImageTintList(icon0, ColorStateList.valueOf(is0 ? primaryColor : unselectedColor));
         label0.setTextColor(primaryColor);
-        label0.setVisibility(isTab0Selected ? View.VISIBLE : View.GONE);
+        label0.setVisibility(is0 ? View.VISIBLE : View.GONE);
 
-        // Apply Tab 1
-        boolean isTab1Selected = selectedIndex == 1;
-        tab1.setBackgroundResource(isTab1Selected ? R.drawable.bg_floating_tab_selected : 0);
-        ImageViewCompat.setImageTintList(icon1, ColorStateList.valueOf(isTab1Selected ? primaryColor : unselectedColor));
+        // Tab 1
+        boolean is1 = selectedIndex == 1;
+        tab1.setBackgroundResource(is1 ? R.drawable.bg_floating_tab_selected : 0);
+        tab1.setPadding(dpToPx(is1 ? 20 : 16), dpToPx(10), dpToPx(is1 ? 20 : 16), dpToPx(10));
+        ImageViewCompat.setImageTintList(icon1, ColorStateList.valueOf(is1 ? primaryColor : unselectedColor));
         label1.setTextColor(primaryColor);
-        label1.setVisibility(isTab1Selected ? View.VISIBLE : View.GONE);
+        label1.setVisibility(is1 ? View.VISIBLE : View.GONE);
     }
 
     private int dpToPx(int dp) {

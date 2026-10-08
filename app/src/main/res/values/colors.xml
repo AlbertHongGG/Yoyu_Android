@@ -1,44 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand / Primary -->
-    <color name="primary">#2563EB</color>
-    <color name="primary_variant">#1D4ED8</color>
-    <color name="primary_light">#DBEAFE</color>
+    <!-- Brand / Primary (Flutter Material 3 seeded from Colors.blueAccent) -->
+    <color name="primary">#475D8E</color>
+    <color name="primary_electric">#2979FF</color>
+    <color name="primary_variant">#355CA8</color>
+    <color name="primary_light">#D6E3FF</color>
+    <color name="primary_subtle">#CC475D8E</color> <!-- 80% opacity for partner name -->
+    <color name="primary_track">#4D475D8E</color> <!-- 30% opacity for track line -->
+    <color name="primary_container">#1A475D8E</color> <!-- 10% opacity for tab bar selected -->
 
-    <!-- Backgrounds Light -->
-    <color name="bg_light">#F8FAFC</color>
+    <!-- Backgrounds & Surfaces (Light) -->
+    <!-- Scaffold background in Flutter: #F8F7FD (soft cool-tinted grayish lavender) -->
+    <color name="bg_light">#F8F7FD</color>
     <color name="surface_light">#FFFFFF</color>
-    <color name="surface_variant_light">#F1F5F9</color>
+    <color name="surface_card_light">#FFFFFF</color>
+    <color name="surface_ticket_light">#FFFFFF</color>
+    <color name="surface_variant_light">#F8FAFC</color>
+    <color name="bg_input_light">#F8FAFC</color>
 
-    <!-- Backgrounds Dark -->
+    <!-- Backgrounds & Surfaces (Dark) -->
     <color name="bg_dark">#121212</color>
     <color name="surface_dark">#1E1E1E</color>
-    <color name="surface_variant_dark">#282828</color>
-    <color name="card_dark">#242424</color>
+    <color name="surface_card_dark">#1E1E1E</color>
+    <color name="surface_ticket_dark">#242424</color>
+    <color name="surface_variant_dark">#242424</color>
+    <color name="bg_input_dark">#242424</color>
 
-    <!-- Typography Light -->
-    <color name="text_primary_light">#1D1D1F</color>
-    <color name="text_secondary_light">#64748B</color>
-    <color name="text_hint_light">#94A3B8</color>
+    <!-- Typography Light (Flutter: black87 / black54 / black38 / black) -->
+    <color name="text_primary_light">#1F1F1F</color>
+    <color name="text_secondary_light">#757575</color>
+    <color name="text_hint_light">#9E9E9E</color>
+    <color name="tx_zero_black">#000000</color>
 
-    <!-- Typography Dark -->
-    <color name="text_primary_dark">#F8FAFC</color>
-    <color name="text_secondary_dark">#94A3B8</color>
-    <color name="text_hint_dark">#64748B</color>
+    <!-- Typography Dark (Flutter: white / white54 / white30) -->
+    <color name="text_primary_dark">#FFFFFF</color>
+    <color name="text_secondary_dark">#8AFFFFFF</color>
+    <color name="text_hint_dark">#4DFFFFFF</color>
 
-    <!-- Functional Colors -->
-    <color name="expense_red">#EF4444</color>
-    <color name="expense_red_bg">#FEE2E2</color>
-    <color name="top_up_blue">#3B82F6</color>
-    <color name="top_up_blue_bg">#DBEAFE</color>
-    <color name="auto_top_up_orange">#F97316</color>
-    <color name="auto_top_up_orange_bg">#FFEDD5</color>
+    <!-- Transaction Amount Colors (Flutter: Colors.red, Colors.green, Colors.black) -->
+    <color name="tx_expense_red">#E53935</color>
+    <color name="tx_income_green">#4CAF50</color>
+
+    <!-- Functional & Analysis Chart Colors (Flutter: red.shade400, blue.shade400, orange.shade400) -->
+    <color name="expense_red">#EF5350</color>
+    <color name="expense_red_bg">#1AEF5350</color>
+    <color name="top_up_blue">#42A5F5</color>
+    <color name="top_up_blue_bg">#1A42A5F5</color>
+    <color name="auto_top_up_orange">#FFA726</color>
+    <color name="auto_top_up_orange_bg">#1AFFA726</color>
     
-    <color name="success_green">#10B981</color>
-    <color name="warning_amber">#F59E0B</color>
+    <color name="danger_red">#FF5252</color>
+    <color name="success_green">#4CAF50</color>
+    <color name="verified_green">#69F0AE</color>
+    <color name="warning_amber">#FFA000</color>
 
-    <!-- Borders & Dividers -->
-    <color name="border_light">#E2E8F0</color>
-    <color name="border_dark">#334155</color>
-    <color name="divider_light">#E2E8F0</color>
-    <color name="divider_dark">#262626</color>
+    <!-- Borders & Dividers (Flutter: black12 #1F000000 / white12 #1FFFFFFF) -->
+    <color name="border_light">#1F000000</color>
+    <color name="border_dark">#1FFFFFFF</color>
+    <color name="divider_light">#1F000000</color>
+    <color name="divider_dark">#1FFFFFFF</color>
+    <color name="tx_divider">#1F000000</color>
+    <color name="tx_divider_dark">#1FFFFFFF</color>
+
+    <!-- Metallic Shimmer Palette -->
+    <color name="shimmer_base_light">#EAEFF5</color>
+    <color name="shimmer_highlight_light">#FFFFFF</color>
+    <color name="shimmer_base_dark">#242424</color>
+    <color name="shimmer_highlight_dark">#3D3D3D</color>
 </resources>

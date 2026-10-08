@@ -45,6 +45,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
         binding.swipeRefresh.setOnRefreshListener(() -> viewModel.refresh());
 
         binding.fabActionTarget.setOnClickListener(v -> {
+            Boolean isDragging = viewModel.getIsDraggingLiveData().getValue();
+            if (Boolean.TRUE.equals(isDragging)) return;
             AddCardBottomSheetDialog dialog = AddCardBottomSheetDialog.newInstance();
             dialog.show(getSupportFragmentManager(), "AddCardBottomSheetDialog");
         });
@@ -77,7 +79,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
 
     private void setupSmartDragTarget() {
         int defaultColor = ContextCompat.getColor(this, R.color.text_secondary_light);
-        int redColor = ContextCompat.getColor(this, R.color.expense_red);
 
         binding.fabActionTarget.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
@@ -103,17 +104,24 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
                     return true;
 
                 case DragEvent.ACTION_DROP:
+                    String cardNoToDelete = null;
                     Object localState = event.getLocalState();
                     if (localState instanceof CardEntity) {
-                        CardEntity droppedCard = (CardEntity) localState;
+                        cardNoToDelete = ((CardEntity) localState).getCardNo();
+                    } else if (event.getClipData() != null && event.getClipData().getItemCount() > 0) {
+                        CharSequence text = event.getClipData().getItemAt(0).getText();
+                        if (text != null) cardNoToDelete = text.toString();
+                    }
+                    if (cardNoToDelete != null) {
                         v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
-                        viewModel.deleteCard(droppedCard.getCardNo());
+                        viewModel.deleteCard(cardNoToDelete);
                         showSuccess("已刪除卡片");
                     }
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
                     viewModel.setDragging(false);
+                    restoreCardsAlpha();
                     animateFabSize(binding.fabActionTarget.getWidth(), dpToPx(56));
                     binding.fabActionTarget.setBackgroundResource(R.drawable.bg_fab_default);
                     binding.ivFabIcon.setImageResource(R.drawable.ic_add);
@@ -124,6 +132,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
                     return false;
             }
         });
+    }
+
+    private void restoreCardsAlpha() {
+        for (int i = 0; i < binding.rvCards.getChildCount(); i++) {
+            View child = binding.rvCards.getChildAt(i);
+            if (child != null) {
+                child.animate().alpha(1.0f).setDuration(150).start();
+            }
+        }
     }
 
     private void animateFabSize(int fromSize, int toSize) {

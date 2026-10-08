@@ -25,11 +25,13 @@
             android:layout_centerVertical="true"
             android:orientation="vertical">
 
+            <!-- Date Range Filter Title -->
             <TextView
                 android:id="@+id/tvDateStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorPrimary"
+                android:includeFontPadding="false"
+                android:textColor="#000000"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 tools:text="2026/07/08" />
@@ -38,7 +40,9 @@
                 android:id="@+id/tvDateEnd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
+                android:layout_marginTop="2dp"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_primary_light"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 tools:text="~ 2026/10/08" />
@@ -70,8 +74,8 @@
             <!-- Partner Filter -->
             <FrameLayout
                 android:id="@+id/btnFilterPartner"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true">
@@ -80,7 +84,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_filter"
+                    android:src="@drawable/ic_filter_list_rounded"
                     app:tint="?android:attr/textColorPrimary" />
 
                 <View
@@ -98,25 +102,25 @@
             <!-- Date Range Filter -->
             <ImageView
                 android:id="@+id/btnDateRange"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="8dp"
-                android:src="@drawable/ic_calendar"
+                android:padding="12dp"
+                android:src="@drawable/ic_date_range_rounded"
                 app:tint="?android:attr/textColorPrimary" />
 
             <!-- Search Button -->
             <ImageView
                 android:id="@+id/btnSearch"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:padding="8dp"
-                android:src="@drawable/ic_search"
+                android:padding="12dp"
+                android:src="@drawable/ic_search_rounded"
                 app:tint="?android:attr/textColorPrimary" />
 
         </LinearLayout>
