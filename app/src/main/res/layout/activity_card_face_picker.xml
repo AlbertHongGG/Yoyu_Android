@@ -28,13 +28,34 @@
             app:tint="?android:attr/textColorPrimary" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:text="@string/choose_card_face"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <!-- Header Right: Toggle Favorite Mode Icon Button -->
+        <FrameLayout
+            android:id="@+id/btnToggleFavorites"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivToggleFavorites"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_favorite_border"
+                app:tint="?android:attr/textColorPrimary" />
+
+        </FrameLayout>
 
     </LinearLayout>
 
@@ -50,6 +71,35 @@
             android:padding="10dp"
             tools:listitem="@layout/item_card_face" />
 
+        <!-- Empty State for Favorites -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyFavorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/ic_favorite_border"
+                app:tint="@color/text_hint_light" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text="尚未加入任何最愛卡面\n點擊卡片下方的 ♡ 即可收藏"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
     </FrameLayout>
 

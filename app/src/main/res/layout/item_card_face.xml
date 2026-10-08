@@ -1,56 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardFaceContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="?attr/colorSurface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:cardPreventCornerOverlap="false">
+    android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Independent Card Face Container with 16dp rounded corners -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardFaceContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:cardPreventCornerOverlap="false">
 
-        <!-- Aspect Ratio 0.63 -> Width:Height = 63:100 (matches Flutter 0.63 childAspectRatio) -->
-        <ImageView
-            android:id="@+id/ivFace"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="63:100"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- Selected Overlay -->
-        <FrameLayout
-            android:id="@+id/layoutSelectedOverlay"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_card_face_selected"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/ivFace"
-            app:layout_constraintEnd_toEndOf="@id/ivFace"
-            app:layout_constraintStart_toStartOf="@id/ivFace"
-            app:layout_constraintTop_toTopOf="@id/ivFace"
-            tools:visibility="visible">
-
+            <!-- Aspect Ratio 0.63 -> Width:Height = 63:100 (matches Flutter 0.63 childAspectRatio) -->
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_check_circle"
-                app:tint="#FFFFFF" />
+                android:id="@+id/ivFace"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintDimensionRatio="63:100"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </FrameLayout>
+            <!-- Selected Overlay -->
+            <FrameLayout
+                android:id="@+id/layoutSelectedOverlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_card_face_selected"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/ivFace"
+                app:layout_constraintEnd_toEndOf="@id/ivFace"
+                app:layout_constraintStart_toStartOf="@id/ivFace"
+                app:layout_constraintTop_toTopOf="@id/ivFace"
+                tools:visibility="visible">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_check_circle"
+                    app:tint="#FFFFFF" />
 
-</androidx.cardview.widget.CardView>
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Separate Footer Info Bar (outside CardView): Card ID on Left, Favorite Heart on Right -->
+    <LinearLayout
+        android:id="@+id/layoutFooter"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="2dp">
+
+        <!-- Card Face ID: e.g. "#5284" -->
+        <TextView
+            android:id="@+id/tvCardFaceId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp"
+            tools:text="#5284" />
+
+        <!-- Favorite Button -->
+        <ImageView
+            android:id="@+id/btnFavorite"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="4dp"
+            android:src="@drawable/ic_favorite_border"
+            app:tint="@color/text_hint_light" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,5 +1,7 @@
 package com.jasonhong.yoyu.presentation.cardface;
 
+import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
@@ -7,15 +9,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable;
 import com.jasonhong.yoyu.databinding.ItemCardFaceBinding;
 import com.jasonhong.yoyu.databinding.ItemCardFaceSkeletonBinding;
+import com.jasonhong.yoyu.domain.model.CardFaceItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,37 +31,52 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int TYPE_SKELETON = 1;
 
     public interface OnCardFaceClickListener {
-        void onCardFaceClick(String url);
+        void onCardFaceClick(CardFaceItem item);
+        void onFavoriteToggle(CardFaceItem item, int position);
+        void onCopyId(CardFaceItem item);
     }
 
-    private final List<String> urls = new ArrayList<>();
+    private final List<CardFaceItem> items = new ArrayList<>();
     private final String selectedUrl;
     private final OnCardFaceClickListener listener;
     private boolean hasNext = true;
 
     public CardFaceAdapter(String selectedUrl, OnCardFaceClickListener listener) {
-        this.selectedUrl = selectedUrl;
+        this.selectedUrl = selectedUrl != null ? selectedUrl : "";
         this.listener = listener;
     }
 
-    public void setHasNext(boolean hasNext) {
-        if (this.hasNext != hasNext) {
-            this.hasNext = hasNext;
-            notifyDataSetChanged();
-        }
-    }
-
-    public void addUrls(List<String> newUrls, boolean hasNext) {
-        if (newUrls != null && !newUrls.isEmpty()) {
-            urls.addAll(newUrls);
+    public void setItems(List<CardFaceItem> newItems, boolean hasNext) {
+        this.items.clear();
+        if (newItems != null) {
+            this.items.addAll(newItems);
         }
         this.hasNext = hasNext;
         notifyDataSetChanged();
     }
 
+    public void addItems(List<CardFaceItem> newItems, boolean hasNext) {
+        if (newItems != null && !newItems.isEmpty()) {
+            this.items.addAll(newItems);
+        }
+        this.hasNext = hasNext;
+        notifyDataSetChanged();
+    }
+
+    public void notifyFavoriteChanged(int position, boolean isFavorite) {
+        if (position >= 0 && position < items.size()) {
+            items.get(position).setFavorite(isFavorite);
+            notifyItemChanged(position, "FAVORITE_PAYLOAD");
+        }
+    }
+
+    public List<CardFaceItem> getItems() {
+        return items;
+    }
+
     @Override
     public int getItemViewType(int position) {
-        if (position < urls.size()) {
+        if (position < items.size()) {
             return TYPE_CARD;
         }
         return TYPE_SKELETON;
@@ -78,16 +98,25 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CardFaceViewHolder) {
-            ((CardFaceViewHolder) holder).bind(urls.get(position));
+            ((CardFaceViewHolder) holder).bind(items.get(position));
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty() && holder instanceof CardFaceViewHolder) {
+            ((CardFaceViewHolder) holder).updateFavoriteUI(items.get(position));
+        } else {
+            super.onBindViewHolder(holder, position, payloads);
         }
     }
 
     @Override
     public int getItemCount() {
-        if (urls.isEmpty()) {
+        if (items.isEmpty()) {
             return hasNext ? 15 : 0; // Initial 15 skeleton cards (5 rows of 3)
         }
-        return urls.size() + (hasNext ? 6 : 0); // Extra 6 skeleton cards at end matching Flutter
+        return items.size() + (hasNext ? 6 : 0); // Extra 6 skeleton cards at end
     }
 
     class CardFaceViewHolder extends RecyclerView.ViewHolder {
@@ -98,33 +127,64 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.binding = binding;
         }
 
-        void bind(String url) {
-            boolean isSelected = url.equals(selectedUrl);
+        void bind(CardFaceItem item) {
+            Context context = itemView.getContext();
+            boolean isSelected = item.getUrl().equals(selectedUrl);
             binding.layoutSelectedOverlay.setVisibility(isSelected ? View.VISIBLE : View.GONE);
 
-            SkeletonPulseDrawable placeholder = new SkeletonPulseDrawable(itemView.getContext(), 16f);
+            binding.tvCardFaceId.setText(item.getFormattedId());
+            updateFavoriteUI(item);
 
-            Glide.with(itemView.getContext())
-                    .load(url)
+            SkeletonPulseDrawable placeholder = new SkeletonPulseDrawable(context, 16f);
+
+            Glide.with(context)
+                    .load(item.getUrl())
                     .transform(new Rotate(90), new CenterCrop())
                     .transition(DrawableTransitionOptions.withCrossFade(200))
                     .placeholder(placeholder)
                     .error(new ColorDrawable(Color.parseColor("#33888888")))
                     .into(binding.ivFace);
 
-            binding.cardFaceContainer.setOnClickListener(v -> {
-                if (listener != null) listener.onCardFaceClick(url);
+            View.OnClickListener cardClickListener = v -> {
+                if (listener != null) listener.onCardFaceClick(item);
+            };
+            binding.cardFaceContainer.setOnClickListener(cardClickListener);
+            binding.ivFace.setOnClickListener(cardClickListener);
+
+            binding.btnFavorite.setOnClickListener(v -> {
+                binding.btnFavorite.animate()
+                        .scaleX(1.3f)
+                        .scaleY(1.3f)
+                        .setDuration(120)
+                        .withEndAction(() -> binding.btnFavorite.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start())
+                        .start();
+                if (listener != null) {
+                    listener.onFavoriteToggle(item, getBindingAdapterPosition());
+                }
             });
+
+            binding.tvCardFaceId.setOnClickListener(v -> {
+                if (listener != null) listener.onCopyId(item);
+            });
+        }
+
+        void updateFavoriteUI(CardFaceItem item) {
+            Context context = itemView.getContext();
+            if (item.isFavorite()) {
+                binding.btnFavorite.setImageResource(R.drawable.ic_favorite_filled);
+                binding.btnFavorite.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.expense_red)));
+            } else {
+                binding.btnFavorite.setImageResource(R.drawable.ic_favorite_border);
+                binding.btnFavorite.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_hint_light)));
+            }
         }
     }
 
     static class SkeletonViewHolder extends RecyclerView.ViewHolder {
-        private final SkeletonPulseDrawable skeletonDrawable;
-
         SkeletonViewHolder(ItemCardFaceSkeletonBinding binding) {
             super(binding.getRoot());
-            skeletonDrawable = new SkeletonPulseDrawable(itemView.getContext(), 16f);
-            binding.viewSkeleton.setBackground(skeletonDrawable);
+            SkeletonPulseDrawable pulse = new SkeletonPulseDrawable(itemView.getContext(), 16f);
+            binding.viewSkeleton.setBackground(pulse);
         }
     }
 }

@@ -1,22 +1,37 @@
 package com.jasonhong.yoyu.presentation.cardface;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.base.BaseActivity;
 import com.jasonhong.yoyu.core.constants.AppConstants;
+import com.jasonhong.yoyu.data.repository.CardFaceFavoriteRepositoryImpl;
 import com.jasonhong.yoyu.data.repository.CardRepositoryImpl;
 import com.jasonhong.yoyu.databinding.ActivityCardFacePickerBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
+import com.jasonhong.yoyu.domain.model.CardFaceItem;
+import com.jasonhong.yoyu.domain.repository.CardFaceFavoriteRepository;
 import com.jasonhong.yoyu.domain.repository.CardRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerBinding> implements CardFaceAdapter.OnCardFaceClickListener {
 
@@ -24,12 +39,22 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
 
     private CardEntity card;
     private CardRepository cardRepository;
+    private CardFaceFavoriteRepository favoriteRepository;
     private CardFaceAdapter adapter;
     private GridLayoutManager layoutManager;
 
+    // "All" mode paging and cached items
+    private final List<CardFaceItem> allItems = new ArrayList<>();
     private int currentPage = 0;
     private boolean isLoading = false;
     private boolean hasNext = true;
+
+    // Preserved scroll position for "All" mode
+    private int allScrollPos = 0;
+    private int allScrollOffset = 0;
+
+    // Mode state: false = All, true = Favorites
+    private boolean isFavoriteMode = false;
 
     @Override
     protected ActivityCardFacePickerBinding inflateBinding(LayoutInflater inflater) {
@@ -45,8 +70,10 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         }
 
         cardRepository = new CardRepositoryImpl(this);
+        favoriteRepository = new CardFaceFavoriteRepositoryImpl(this);
 
         binding.btnBack.setOnClickListener(v -> finish());
+        binding.btnToggleFavorites.setOnClickListener(v -> toggleFavoriteMode());
 
         layoutManager = new GridLayoutManager(this, 3);
         binding.rvCardFaces.setLayoutManager(layoutManager);
@@ -58,7 +85,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0 && !isLoading && hasNext) {
+                if (!isFavoriteMode && dy > 0 && !isLoading && hasNext) {
                     int visibleItemCount = layoutManager.getChildCount();
                     int totalItemCount = layoutManager.getItemCount();
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
@@ -73,6 +100,60 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         loadMore();
     }
 
+    private void toggleFavoriteMode() {
+        triggerHaptic();
+        isFavoriteMode = !isFavoriteMode;
+
+        if (isFavoriteMode) {
+            // Save current scroll position in "All" mode
+            allScrollPos = layoutManager.findFirstVisibleItemPosition();
+            View firstChild = layoutManager.getChildAt(0);
+            allScrollOffset = (firstChild != null) ? firstChild.getTop() : 0;
+
+            // Update AppBar UI to Favorites state
+            binding.ivToggleFavorites.setImageResource(R.drawable.ic_favorite_filled);
+            binding.ivToggleFavorites.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.expense_red)));
+            binding.tvTitle.setText("我的最愛封面");
+
+            loadFavoritesList();
+        } else {
+            // Restore AppBar UI to All state
+            binding.ivToggleFavorites.setImageResource(R.drawable.ic_favorite_border);
+            binding.ivToggleFavorites.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.text_primary_light)));
+            binding.tvTitle.setText(R.string.choose_card_face);
+
+            binding.layoutEmptyFavorites.setVisibility(View.GONE);
+            binding.rvCardFaces.setVisibility(View.VISIBLE);
+
+            // Re-sync favorite status in allItems in case it changed
+            for (CardFaceItem item : allItems) {
+                item.setFavorite(favoriteRepository.isFavorite(item.getId()));
+            }
+            adapter.setItems(allItems, hasNext);
+
+            // Seamlessly restore scroll position in "All" mode
+            layoutManager.scrollToPositionWithOffset(allScrollPos, allScrollOffset);
+        }
+    }
+
+    private void loadFavoritesList() {
+        Set<Integer> favIds = favoriteRepository.getFavoriteIds();
+        if (favIds.isEmpty()) {
+            binding.layoutEmptyFavorites.setVisibility(View.VISIBLE);
+            binding.rvCardFaces.setVisibility(View.GONE);
+            adapter.setItems(Collections.emptyList(), false);
+        } else {
+            binding.layoutEmptyFavorites.setVisibility(View.GONE);
+            binding.rvCardFaces.setVisibility(View.VISIBLE);
+            List<CardFaceItem> favItems = new ArrayList<>();
+            for (Integer id : favIds) {
+                favItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", true));
+            }
+            adapter.setItems(favItems, false);
+            layoutManager.scrollToPositionWithOffset(0, 0);
+        }
+    }
+
     private void loadMore() {
         if (isLoading || !hasNext) return;
 
@@ -81,27 +162,66 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         int startIndex = currentPage * PAGE_SIZE;
         int endIndex = Math.min(startIndex + PAGE_SIZE, CardFaceConstants.ALLOWED_IMAGE_IDS.length);
 
-        List<String> batchUrls = new ArrayList<>();
+        List<CardFaceItem> batchItems = new ArrayList<>();
         for (int i = startIndex; i < endIndex; i++) {
             int id = CardFaceConstants.ALLOWED_IMAGE_IDS[i];
-            batchUrls.add(AppConstants.CARD_FACE_CDN_BASE + id + ".webp");
+            boolean isFav = favoriteRepository.isFavorite(id);
+            batchItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", isFav));
         }
 
+        allItems.addAll(batchItems);
         currentPage++;
         hasNext = endIndex < CardFaceConstants.ALLOWED_IMAGE_IDS.length;
 
-        // Post to adapter
         binding.rvCardFaces.post(() -> {
-            adapter.addUrls(batchUrls, hasNext);
+            if (!isFavoriteMode) {
+                adapter.addItems(batchItems, hasNext);
+            }
             isLoading = false;
         });
     }
 
     @Override
-    public void onCardFaceClick(String url) {
-        CardEntity updated = card.copyWithCardFaceUrl(url);
+    public void onCardFaceClick(CardFaceItem item) {
+        triggerHaptic();
+        CardEntity updated = card.copyWithCardFaceUrl(item.getUrl());
         cardRepository.updateCard(updated).thenAccept(v -> {
             runOnUiThread(this::finish);
         });
+    }
+
+    @Override
+    public void onFavoriteToggle(CardFaceItem item, int position) {
+        triggerHaptic();
+        boolean newFav = favoriteRepository.toggleFavorite(item.getId());
+        item.setFavorite(newFav);
+
+        if (isFavoriteMode) {
+            loadFavoritesList();
+        } else {
+            adapter.notifyFavoriteChanged(position, newFav);
+        }
+    }
+
+    @Override
+    public void onCopyId(CardFaceItem item) {
+        triggerHaptic();
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null) {
+            ClipData clip = ClipData.newPlainText("CardFace ID", item.getFormattedId());
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "已複製卡面 ID " + item.getFormattedId(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void triggerHaptic() {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(20);
+            }
+        }
     }
 }
