@@ -8,6 +8,7 @@ import com.jasonhong.yoyu.domain.repository.CardFaceFavoriteRepository;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class CardFaceFavoriteRepositoryImpl implements CardFaceFavoriteRepository {
 
@@ -15,7 +16,7 @@ public class CardFaceFavoriteRepositoryImpl implements CardFaceFavoriteRepositor
     private static final String KEY_FAVORITE_IDS = "favorite_ids";
 
     private final SharedPreferences prefs;
-    private final Set<Integer> cache = new HashSet<>();
+    private final Set<Integer> cache = new TreeSet<>();
     private final Object lock = new Object();
 
     public CardFaceFavoriteRepositoryImpl(Context context) {
@@ -85,7 +86,7 @@ public class CardFaceFavoriteRepositoryImpl implements CardFaceFavoriteRepositor
     @Override
     public Set<Integer> getFavoriteIds() {
         synchronized (lock) {
-            return new HashSet<>(cache);
+            return new TreeSet<>(cache);
         }
     }
 }

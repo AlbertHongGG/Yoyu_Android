@@ -3,7 +3,7 @@ package com.jasonhong.yoyu.domain.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-public final class CardFaceItem implements Serializable {
+public final class CardFaceItem implements Serializable, Comparable<CardFaceItem> {
     private final int id;
     private final String url;
     private boolean isFavorite;
@@ -49,5 +49,11 @@ public final class CardFaceItem implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, url, isFavorite);
+    }
+
+    @Override
+    public int compareTo(CardFaceItem o) {
+        if (o == null) return 1;
+        return Integer.compare(this.id, o.id);
     }
 }

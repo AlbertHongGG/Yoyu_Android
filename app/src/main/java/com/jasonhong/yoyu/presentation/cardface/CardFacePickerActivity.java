@@ -126,6 +126,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
             binding.tvTitle.setText("我的最愛封面");
 
             loadFavoritesList();
+            layoutManager.scrollToPositionWithOffset(0, 0);
         } else {
             // Restore AppBar UI to All state
             binding.ivToggleFavorites.setImageResource(R.drawable.ic_favorite_border);
@@ -155,12 +156,13 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         } else {
             binding.layoutEmptyFavorites.setVisibility(View.GONE);
             binding.rvCardFaces.setVisibility(View.VISIBLE);
-            List<CardFaceItem> favItems = new ArrayList<>();
-            for (Integer id : favIds) {
+            List<Integer> sortedIds = new ArrayList<>(favIds);
+            Collections.sort(sortedIds);
+            List<CardFaceItem> favItems = new ArrayList<>(sortedIds.size());
+            for (Integer id : sortedIds) {
                 favItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", true));
             }
             adapter.setItems(favItems);
-            layoutManager.scrollToPositionWithOffset(0, 0);
         }
     }
 
