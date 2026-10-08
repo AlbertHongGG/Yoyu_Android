@@ -97,32 +97,37 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" />
 
-        <!-- Body (單點消費/加值: 絕對約束中心錨定) -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Body (單點消費/加值: 3 Column 絕對網格對齊，16dp padding) -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Graphic Point: Solid Dot (8dp, vertically centered on tvDescription) -->
-            <View
-                android:id="@+id/viewDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/bg_transit_bottom_dot"
-                app:layout_constraintBottom_toBottomOf="@id/tvDescription"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvDescription" />
+            <!-- Column 1: Graphic (Fixed 30dp width) -->
+            <FrameLayout
+                android:layout_width="30dp"
+                android:layout_height="wrap_content">
 
-            <!-- Location & Description -->
+                <View
+                    android:id="@+id/viewDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:background="@drawable/bg_transit_bottom_dot" />
+
+            </FrameLayout>
+
+            <!-- Column 2: Location & Description (Expanded width) -->
             <TextView
                 android:id="@+id/tvDescription"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
                 android:includeFontPadding="false"
@@ -130,27 +135,21 @@
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tvTime"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="台北車站 加值" />
 
-            <!-- Time (Transaction Time, vertically centered on tvDescription) -->
+            <!-- Column 3: Time (Fixed 50dp width) -->
             <TextView
                 android:id="@+id/tvTime"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
+                android:gravity="end"
                 android:includeFontPadding="false"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@id/tvDescription"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvDescription"
                 tools:text="18:27" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

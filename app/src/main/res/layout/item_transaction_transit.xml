@@ -97,115 +97,123 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" />
 
-        <!-- Body (乘車站點與時序軌跡: 絕對約束中心錨定) -->
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Body (票面: 3 Column 絕對網格對齊，16dp padding) -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Graphic Track: Top Hollow Dot (8dp, vertically centered on tvInLocation) -->
-            <View
-                android:id="@+id/viewTopDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/bg_transit_top_dot"
-                app:layout_constraintBottom_toBottomOf="@id/tvInLocation"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvInLocation" />
+            <!-- Column 1: Graphic (Fixed 30dp width, 40dp height, 8dp circles + 16dp floating line with 4dp gaps) -->
+            <LinearLayout
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:gravity="start"
+                android:orientation="vertical">
 
-            <!-- Graphic Track: Bottom Solid Dot (8dp, vertically centered on tvOutLocation) -->
-            <View
-                android:id="@+id/viewBottomDot"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/bg_transit_bottom_dot"
-                app:layout_constraintBottom_toBottomOf="@id/tvOutLocation"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvOutLocation" />
+                <!-- Top Hollow Circle (8dp x 8dp) -->
+                <View
+                    android:id="@+id/viewTopDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_transit_top_dot" />
 
-            <!-- Graphic Track: Connecting Line (2dp, connects viewTopDot and viewBottomDot) -->
-            <View
-                android:id="@+id/viewTrackLine"
-                android:layout_width="2dp"
-                android:layout_height="0dp"
-                android:background="@color/primary_track"
-                app:layout_constraintBottom_toTopOf="@id/viewBottomDot"
-                app:layout_constraintEnd_toEndOf="@id/viewTopDot"
-                app:layout_constraintStart_toStartOf="@id/viewTopDot"
-                app:layout_constraintTop_toBottomOf="@id/viewTopDot" />
+                <!-- Middle Short Line Segment (2dp width, 16dp height, 4dp gaps, 3dp start margin) -->
+                <View
+                    android:id="@+id/viewTrackLine"
+                    android:layout_width="2dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@color/primary_track" />
 
-            <!-- In Location (Boarding Station) -->
-            <TextView
-                android:id="@+id/tvInLocation"
+                <!-- Bottom Solid Circle (8dp x 8dp) -->
+                <View
+                    android:id="@+id/viewBottomDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_transit_bottom_dot" />
+
+            </LinearLayout>
+
+            <!-- Column 2: Locations (Expanded width, 42dp height, vertical spaceBetween) -->
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="12dp"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/tvInTime"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="台北車站" />
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <!-- Out Location (Alighting Station) -->
-            <TextView
-                android:id="@+id/tvOutLocation"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="12dp"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tvOutTime"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvInLocation"
-                tools:text="大橋頭" />
+                <TextView
+                    android:id="@+id/tvInLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif"
+                    android:gravity="top"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="台北車站" />
 
-            <!-- In Time (Boarding Time) -->
-            <TextView
-                android:id="@+id/tvInTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:includeFontPadding="false"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@id/tvInLocation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvInLocation"
-                tools:text="23:07" />
+                <TextView
+                    android:id="@+id/tvOutLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif"
+                    android:gravity="bottom"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="大橋頭" />
 
-            <!-- Out Time (Alighting Time) -->
-            <TextView
-                android:id="@+id/tvOutTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:includeFontPadding="false"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@id/tvOutLocation"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvOutLocation"
-                tools:text="23:21" />
+            </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Column 3: Times (Fixed 50dp width, 42dp height, vertical spaceBetween) -->
+            <LinearLayout
+                android:layout_width="50dp"
+                android:layout_height="42dp"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvInTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:fontFamily="monospace"
+                    android:gravity="top|end"
+                    android:includeFontPadding="false"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="12sp"
+                    tools:text="23:07" />
+
+                <TextView
+                    android:id="@+id/tvOutTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:fontFamily="monospace"
+                    android:gravity="bottom|end"
+                    android:includeFontPadding="false"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="12sp"
+                    tools:text="23:21" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
