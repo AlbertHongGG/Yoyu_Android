@@ -60,6 +60,45 @@ public class TransactionDomainTest {
     }
 
     @Test
+    public void testKaohsiungMrtPairing() throws Exception {
+        List<RawTransactionDto> rawList = new ArrayList<>();
+        // Kaohsiung MRT with DataSource="I"
+        // In-station at R3 Siaogang
+        rawList.add(createRaw("309", 1790243645, "進站", "高雄捷運", 101.0, "R3小港", "I", "-0"));
+        // Out-station at R16 Zuoying
+        rawList.add(createRaw("310", 1790245668, "出站", "高雄捷運", 51.0, "R16左營", "I", "-50"));
+
+        TransactionAggregator aggregator = new TransactionAggregator();
+        List<YoyuTransaction> result = aggregator.aggregate(rawList);
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0) instanceof TransitTransaction);
+        TransitTransaction t = (TransitTransaction) result.get(0);
+        assertEquals(-50, t.getAmount());
+        assertEquals("R3小港", t.getInLocation());
+        assertEquals("R16左營", t.getOutLocation());
+        assertEquals(51.0, t.getBalance(), 0.001);
+    }
+
+    @Test
+    public void testSemanticTransitFallback() throws Exception {
+        List<RawTransactionDto> rawList = new ArrayList<>();
+        // Unknown future DataSource="X" with transit xtype
+        rawList.add(createRaw("401", 100, "進站", "未來新輕軌", 100.0, "起站", "X", "-0"));
+        rawList.add(createRaw("402", 200, "出站", "未來新輕軌", 80.0, "迄站", "X", "-20"));
+
+        TransactionAggregator aggregator = new TransactionAggregator();
+        List<YoyuTransaction> result = aggregator.aggregate(rawList);
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0) instanceof TransitTransaction);
+        TransitTransaction t = (TransitTransaction) result.get(0);
+        assertEquals(-20, t.getAmount());
+        assertEquals("起站", t.getInLocation());
+        assertEquals("迄站", t.getOutLocation());
+    }
+
+    @Test
     public void testRetailParsing() throws Exception {
         List<RawTransactionDto> rawList = new ArrayList<>();
         rawList.add(createRaw("003", 300, "小額消費", "7-ELEVEN", 60.0, "門市A", "4", "-20"));

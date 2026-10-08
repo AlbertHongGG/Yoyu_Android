@@ -97,123 +97,115 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" />
 
-        <!-- Body (票面: 3 Column 絕對網格對齊，16dp padding) -->
-        <LinearLayout
+        <!-- Body (票面主體: 幾何錨點約束架構，16dp horizontal, 16dp vertical) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Column 1: Graphic (Fixed 30dp width, 40dp height, 8dp circles + 16dp floating line with 4dp gaps) -->
-            <LinearLayout
-                android:layout_width="30dp"
-                android:layout_height="40dp"
-                android:gravity="start"
-                android:orientation="vertical">
+            <!-- 起點空心圓 (8dp x 8dp) - 作為起點行的絕對幾何錨點 -->
+            <View
+                android:id="@+id/viewTopDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_transit_top_dot"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Top Hollow Circle (8dp x 8dp) -->
-                <View
-                    android:id="@+id/viewTopDot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:background="@drawable/bg_transit_top_dot" />
-
-                <!-- Middle Short Line Segment (2dp width, 16dp height, 4dp gaps, 3dp start margin) -->
-                <View
-                    android:id="@+id/viewTrackLine"
-                    android:layout_width="2dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/primary_track" />
-
-                <!-- Bottom Solid Circle (8dp x 8dp) -->
-                <View
-                    android:id="@+id/viewBottomDot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:background="@drawable/bg_transit_bottom_dot" />
-
-            </LinearLayout>
-
-            <!-- Column 2: Locations (Expanded width, 42dp height, vertical spaceBetween) -->
-            <LinearLayout
+            <!-- 起點站名 - 垂直中線嚴格雙向約束鎖定 viewTopDot 中心 -->
+            <TextView
+                android:id="@+id/tvInLocation"
                 android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="12dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@id/viewTopDot"
+                app:layout_constraintEnd_toStartOf="@id/tvInTime"
+                app:layout_constraintStart_toEndOf="@id/viewTopDot"
+                app:layout_constraintTop_toTopOf="@id/viewTopDot"
+                tools:text="台北車站" />
 
-                <TextView
-                    android:id="@+id/tvInLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:fontFamily="sans-serif"
-                    android:gravity="top"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="台北車站" />
+            <!-- 進站時間 - 垂直中線嚴格雙向約束鎖定 viewTopDot 中心 -->
+            <TextView
+                android:id="@+id/tvInTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:includeFontPadding="false"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/viewTopDot"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/viewTopDot"
+                tools:text="23:07" />
 
-                <TextView
-                    android:id="@+id/tvOutLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:fontFamily="sans-serif"
-                    android:gravity="bottom"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="大橋頭" />
+            <!-- 垂直軌道連接線 (2dp width) - 居中對齊圓點並垂直在兩圓點間自動精確拉伸 -->
+            <View
+                android:id="@+id/viewTrackLine"
+                android:layout_width="2dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:background="@color/primary_track"
+                app:layout_constraintBottom_toTopOf="@id/viewBottomDot"
+                app:layout_constraintEnd_toEndOf="@id/viewTopDot"
+                app:layout_constraintStart_toStartOf="@id/viewTopDot"
+                app:layout_constraintTop_toBottomOf="@id/viewTopDot" />
 
-            </LinearLayout>
+            <!-- 終點實心圓 (8dp x 8dp) - 位於起點行下方，預留自然舒適的乘車行距 (22dp) -->
+            <View
+                android:id="@+id/viewBottomDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="22dp"
+                android:background="@drawable/bg_transit_bottom_dot"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/viewTopDot"
+                app:layout_constraintTop_toBottomOf="@id/viewTopDot" />
 
-            <!-- Column 3: Times (Fixed 50dp width, 42dp height, vertical spaceBetween) -->
-            <LinearLayout
-                android:layout_width="50dp"
-                android:layout_height="42dp"
-                android:gravity="end"
-                android:orientation="vertical">
+            <!-- 終點站名 - 垂直中線嚴格雙向約束鎖定 viewBottomDot 中心 -->
+            <TextView
+                android:id="@+id/tvOutLocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="12dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@id/viewBottomDot"
+                app:layout_constraintEnd_toStartOf="@id/tvOutTime"
+                app:layout_constraintStart_toEndOf="@id/viewBottomDot"
+                app:layout_constraintTop_toTopOf="@id/viewBottomDot"
+                tools:text="大橋頭" />
 
-                <TextView
-                    android:id="@+id/tvInTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:fontFamily="monospace"
-                    android:gravity="top|end"
-                    android:includeFontPadding="false"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp"
-                    tools:text="23:07" />
+            <!-- 出站時間 - 垂直中線嚴格雙向約束鎖定 viewBottomDot 中心 -->
+            <TextView
+                android:id="@+id/tvOutTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:includeFontPadding="false"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/viewBottomDot"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/viewBottomDot"
+                tools:text="23:21" />
 
-                <TextView
-                    android:id="@+id/tvOutTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:fontFamily="monospace"
-                    android:gravity="bottom|end"
-                    android:includeFontPadding="false"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp"
-                    tools:text="23:21" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

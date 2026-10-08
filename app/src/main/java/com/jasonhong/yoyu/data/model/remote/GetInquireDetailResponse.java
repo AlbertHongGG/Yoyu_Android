@@ -51,6 +51,9 @@ public class GetInquireDetailResponse {
         @SerializedName("AMT")
         private String amt;
 
+        @SerializedName("InquireIcon")
+        private String inquireIcon;
+
         public String getTraceNo() {
             return traceNo != null ? traceNo : "";
         }
@@ -81,6 +84,10 @@ public class GetInquireDetailResponse {
 
         public String getAmt() {
             return amt != null ? amt : "0";
+        }
+
+        public String getInquireIcon() {
+            return inquireIcon != null ? inquireIcon : "";
         }
     }
 }

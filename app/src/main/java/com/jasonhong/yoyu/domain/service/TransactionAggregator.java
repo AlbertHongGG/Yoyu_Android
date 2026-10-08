@@ -12,15 +12,20 @@ public class TransactionAggregator {
 
     private final TransactionParser transitParser;
     private final TransactionParser retailParser;
+    private final TransactionClassifier classifier;
 
     public TransactionAggregator() {
-        this.transitParser = new TransitParser();
-        this.retailParser = new RetailParser();
+        this(new TransitParser(), new RetailParser(), new TransactionClassifier());
     }
 
     public TransactionAggregator(TransactionParser transitParser, TransactionParser retailParser) {
+        this(transitParser, retailParser, new TransactionClassifier());
+    }
+
+    public TransactionAggregator(TransactionParser transitParser, TransactionParser retailParser, TransactionClassifier classifier) {
         this.transitParser = transitParser;
         this.retailParser = retailParser;
+        this.classifier = classifier;
     }
 
     public List<YoyuTransaction> aggregate(List<RawTransactionDto> rawTransactions) {
@@ -46,11 +51,9 @@ public class TransactionAggregator {
             String dataSource = entry.getKey();
             List<RawTransactionDto> list = entry.getValue();
 
-            // "F": MRT, "6": Train, "2": Bus - all transit types
-            if ("F".equals(dataSource) || "6".equals(dataSource) || "2".equals(dataSource)) {
+            if (classifier.isTransitGroup(dataSource, list)) {
                 allTransactions.addAll(transitParser.parse(list));
             } else {
-                // "4": YouBike, "5": MRT Add Value, "8": Store Add Value, etc.
                 allTransactions.addAll(retailParser.parse(list));
             }
         }

@@ -73,98 +73,86 @@
             android:layout_marginEnd="16dp"
             android:alpha="0.4" />
 
-        <!-- Body (票面: 3 Column 絕對網格對齊，16dp padding) -->
-        <LinearLayout
+        <!-- Body Skeleton (幾何錨點約束架構，16dp horizontal, 16dp vertical) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Column 1: Graphic (Fixed 30dp width, 40dp height) -->
-            <LinearLayout
-                android:layout_width="30dp"
-                android:layout_height="40dp"
-                android:gravity="start"
-                android:orientation="vertical">
+            <!-- 起點空心圓骨架 (8dp x 8dp) -->
+            <View
+                android:id="@+id/viewSkeletonTopDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- Top Circle (8dp x 8dp) -->
-                <View
-                    android:id="@+id/viewSkeletonTopDot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp" />
+            <!-- 起點站名骨架 - 垂直中線對齊圓點 -->
+            <View
+                android:id="@+id/viewSkeletonInLocation"
+                android:layout_width="100dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/viewSkeletonTopDot"
+                app:layout_constraintStart_toEndOf="@id/viewSkeletonTopDot"
+                app:layout_constraintTop_toTopOf="@id/viewSkeletonTopDot" />
 
-                <!-- Middle Line Segment (2dp width, 16dp height, 4dp gaps, 3dp start margin) -->
-                <View
-                    android:id="@+id/viewSkeletonTrackLine"
-                    android:layout_width="2dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:alpha="0.4"
-                    android:background="@color/primary_track" />
+            <!-- 進站時間骨架 - 垂直中線對齊圓點 -->
+            <View
+                android:id="@+id/viewSkeletonInTime"
+                android:layout_width="36dp"
+                android:layout_height="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/viewSkeletonTopDot"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/viewSkeletonTopDot" />
 
-                <!-- Bottom Circle (8dp x 8dp) -->
-                <View
-                    android:id="@+id/viewSkeletonBottomDot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp" />
+            <!-- 垂直軌道連接線骨架 -->
+            <View
+                android:id="@+id/viewSkeletonTrackLine"
+                android:layout_width="2dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:alpha="0.4"
+                android:background="@color/primary_track"
+                app:layout_constraintBottom_toTopOf="@id/viewSkeletonBottomDot"
+                app:layout_constraintEnd_toEndOf="@id/viewSkeletonTopDot"
+                app:layout_constraintStart_toStartOf="@id/viewSkeletonTopDot"
+                app:layout_constraintTop_toBottomOf="@id/viewSkeletonTopDot" />
 
-            </LinearLayout>
+            <!-- 終點實心圓骨架 (8dp x 8dp) - 下移 22dp -->
+            <View
+                android:id="@+id/viewSkeletonBottomDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="22dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/viewSkeletonTopDot"
+                app:layout_constraintTop_toBottomOf="@id/viewSkeletonTopDot" />
 
-            <!-- Column 2: Locations (Expanded width, 42dp height, vertical spaceBetween) -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+            <!-- 終點站名骨架 - 垂直中線對齊圓點 -->
+            <View
+                android:id="@+id/viewSkeletonOutLocation"
+                android:layout_width="72dp"
+                android:layout_height="15dp"
+                android:layout_marginStart="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/viewSkeletonBottomDot"
+                app:layout_constraintStart_toEndOf="@id/viewSkeletonBottomDot"
+                app:layout_constraintTop_toTopOf="@id/viewSkeletonBottomDot" />
 
-                <View
-                    android:id="@+id/viewSkeletonInLocation"
-                    android:layout_width="100dp"
-                    android:layout_height="15dp" />
+            <!-- 出站時間骨架 - 垂直中線對齊圓點 -->
+            <View
+                android:id="@+id/viewSkeletonOutTime"
+                android:layout_width="36dp"
+                android:layout_height="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/viewSkeletonBottomDot"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/viewSkeletonBottomDot" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <View
-                    android:id="@+id/viewSkeletonOutLocation"
-                    android:layout_width="72dp"
-                    android:layout_height="15dp" />
-
-            </LinearLayout>
-
-            <!-- Column 3: Times (Fixed 50dp width, 42dp height, vertical spaceBetween) -->
-            <LinearLayout
-                android:layout_width="50dp"
-                android:layout_height="42dp"
-                android:gravity="end"
-                android:orientation="vertical">
-
-                <View
-                    android:id="@+id/viewSkeletonInTime"
-                    android:layout_width="36dp"
-                    android:layout_height="12dp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <View
-                    android:id="@+id/viewSkeletonOutTime"
-                    android:layout_width="36dp"
-                    android:layout_height="12dp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
