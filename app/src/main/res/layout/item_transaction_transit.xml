@@ -17,76 +17,79 @@
         android:orientation="vertical">
 
         <!-- Header (票頭: 16dp horizontal, 12dp vertical) -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="12dp"
             android:paddingEnd="16dp"
             android:paddingBottom="12dp">
 
-            <!-- Date & Partner Name -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_secondary_light"
-                    android:textSize="12sp"
-                    tools:text="09/24" />
-
-                <TextView
-                    android:id="@+id/tvPartnerName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:textColor="@color/primary_subtle"
-                    android:textSize="12sp"
-                    tools:text="臺北捷運" />
-
-            </LinearLayout>
-
-            <!-- Amount & Balance (Aligned Baseline) -->
-            <LinearLayout
+            <!-- Date -->
+            <TextView
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:baselineAligned="true"
-                android:orientation="horizontal">
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_secondary_light"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="09/24" />
 
-                <TextView
-                    android:id="@+id/tvBalance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_hint_light"
-                    android:textSize="11sp"
-                    tools:text="餘 $31" />
+            <!-- Partner Name -->
+            <TextView
+                android:id="@+id/tvPartnerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="12dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/primary_subtle"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/tvDate"
+                app:layout_constraintEnd_toStartOf="@id/tvBalance"
+                app:layout_constraintStart_toEndOf="@id/tvDate"
+                app:layout_constraintTop_toTopOf="@id/tvDate"
+                tools:text="臺北捷運" />
 
-                <TextView
-                    android:id="@+id/tvAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:fontFamily="@font/font_outfit"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    tools:text="-20"
-                    tools:textColor="@color/tx_expense_red" />
+            <!-- Balance (Aligned Baseline to Amount) -->
+            <TextView
+                android:id="@+id/tvBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:textColor="@color/text_hint_light"
+                android:textSize="11sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/tvAmount"
+                app:layout_constraintEnd_toStartOf="@id/tvAmount"
+                tools:text="餘 $31" />
 
-            </LinearLayout>
+            <!-- Amount -->
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="-20"
+                tools:textColor="@color/tx_expense_red" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Dashed Divider (折線) -->
+        <!-- Dashed Divider (折線: 1dp height, 16dp margins) -->
         <com.jasonhong.yoyu.core.widgets.DashedDividerView
             android:id="@+id/dashedDivider"
             android:layout_width="match_parent"
@@ -94,94 +97,115 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" />
 
-        <!-- Body (乘車站點與時序軌跡: 16dp padding) -->
-        <LinearLayout
+        <!-- Body (乘車站點與時序軌跡: 絕對約束中心錨定) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
 
-            <!-- Graphic Track (Fixed 30dp, start-aligned, 42dp height) -->
-            <com.jasonhong.yoyu.core.widgets.TransitTrackView
-                android:id="@+id/trackView"
-                android:layout_width="30dp"
-                android:layout_height="42dp" />
+            <!-- Graphic Track: Top Hollow Dot (8dp, vertically centered on tvInLocation) -->
+            <View
+                android:id="@+id/viewTopDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_transit_top_dot"
+                app:layout_constraintBottom_toBottomOf="@id/tvInLocation"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvInLocation" />
 
-            <!-- Locations (Vertical Pair, Height 42dp) -->
-            <LinearLayout
+            <!-- Graphic Track: Bottom Solid Dot (8dp, vertically centered on tvOutLocation) -->
+            <View
+                android:id="@+id/viewBottomDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/bg_transit_bottom_dot"
+                app:layout_constraintBottom_toBottomOf="@id/tvOutLocation"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvOutLocation" />
+
+            <!-- Graphic Track: Connecting Line (2dp, connects viewTopDot and viewBottomDot) -->
+            <View
+                android:id="@+id/viewTrackLine"
+                android:layout_width="2dp"
+                android:layout_height="0dp"
+                android:background="@color/primary_track"
+                app:layout_constraintBottom_toTopOf="@id/viewBottomDot"
+                app:layout_constraintEnd_toEndOf="@id/viewTopDot"
+                app:layout_constraintStart_toStartOf="@id/viewTopDot"
+                app:layout_constraintTop_toBottomOf="@id/viewTopDot" />
+
+            <!-- In Location (Boarding Station) -->
+            <TextView
+                android:id="@+id/tvInLocation"
                 android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="12dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/tvInTime"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="台北車站" />
 
-                <TextView
-                    android:id="@+id/tvInLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:gravity="top"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="台北車站" />
+            <!-- Out Location (Alighting Station) -->
+            <TextView
+                android:id="@+id/tvOutLocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="12dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tvOutTime"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvInLocation"
+                tools:text="大橋頭" />
 
-                <TextView
-                    android:id="@+id/tvOutLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:gravity="bottom"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="大橋頭" />
+            <!-- In Time (Boarding Time) -->
+            <TextView
+                android:id="@+id/tvInTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:includeFontPadding="false"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/tvInLocation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvInLocation"
+                tools:text="23:07" />
 
-            </LinearLayout>
+            <!-- Out Time (Alighting Time) -->
+            <TextView
+                android:id="@+id/tvOutTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:includeFontPadding="false"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/tvOutLocation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tvOutLocation"
+                tools:text="23:21" />
 
-            <!-- Times (Vertical Pair, Fixed 50dp, Height 42dp) -->
-            <LinearLayout
-                android:layout_width="50dp"
-                android:layout_height="42dp"
-                android:gravity="end"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvInTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:fontFamily="monospace"
-                    android:gravity="top|end"
-                    android:includeFontPadding="false"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp"
-                    tools:text="23:07" />
-
-                <TextView
-                    android:id="@+id/tvOutTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:fontFamily="monospace"
-                    android:gravity="bottom|end"
-                    android:includeFontPadding="false"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp"
-                    tools:text="23:21" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

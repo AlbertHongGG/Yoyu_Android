@@ -12,8 +12,6 @@
         <item name="colorOnSurface">@color/text_primary_light</item>
         <item name="android:textColorPrimary">@color/text_primary_light</item>
         <item name="android:textColorSecondary">@color/text_secondary_light</item>
-        <item name="fontFamily">@font/font_outfit</item>
-        <item name="android:fontFamily">@font/font_outfit</item>
         <item name="bottomSheetDialogTheme">@style/Theme.Yoyu.BottomSheet</item>
     </style>
 
@@ -30,7 +28,5 @@
         <item name="android:windowBackground">#FFFFFF</item>
         <item name="android:statusBarColor">#FFFFFF</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="fontFamily">@font/font_outfit</item>
-        <item name="android:fontFamily">@font/font_outfit</item>
     </style>
 </resources>

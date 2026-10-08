@@ -102,7 +102,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             int colorRes = amt < 0 ? R.color.tx_expense_red : (amt > 0 ? R.color.tx_income_green : (isDark ? R.color.text_primary_dark : R.color.tx_zero_black));
             binding.tvAmount.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
 
-            binding.trackView.setMode(com.jasonhong.yoyu.core.widgets.TransitTrackView.MODE_TRANSIT);
             binding.tvInLocation.setText(tx.getInLocation());
             binding.tvOutLocation.setText(tx.getOutLocation());
 
@@ -132,7 +131,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             int colorRes = amt < 0 ? R.color.tx_expense_red : (amt > 0 ? R.color.tx_income_green : (isDark ? R.color.text_primary_dark : R.color.tx_zero_black));
             binding.tvAmount.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
 
-            binding.trackView.setMode(com.jasonhong.yoyu.core.widgets.TransitTrackView.MODE_RETAIL);
             String desc = (tx.getLocation() + " " + tx.getDescription()).trim();
             binding.tvDescription.setText(desc);
             binding.tvTime.setText(timeFormat.format(tx.getTime()));

@@ -8,6 +8,7 @@
     <color name="primary_subtle">#CC475D8E</color> <!-- 80% opacity for partner name -->
     <color name="primary_track">#4D475D8E</color> <!-- 30% opacity for track line -->
     <color name="primary_container">#1A475D8E</color> <!-- 10% opacity for tab bar selected -->
+    <color name="tab_bar_bg">#FFFFFF</color>
 
     <!-- Backgrounds & Surfaces (Light) -->
     <!-- Scaffold background in Flutter: #F8F7FD (soft cool-tinted grayish lavender) -->
@@ -59,8 +60,8 @@
     <color name="border_dark">#1FFFFFFF</color>
     <color name="divider_light">#1F000000</color>
     <color name="divider_dark">#1FFFFFFF</color>
-    <color name="tx_divider">#1F000000</color>
-    <color name="tx_divider_dark">#1FFFFFFF</color>
+    <color name="tx_divider">#26000000</color>
+    <color name="tx_divider_dark">#26FFFFFF</color>
 
     <!-- Metallic Shimmer Palette -->
     <color name="shimmer_base_light">#EAEFF5</color>

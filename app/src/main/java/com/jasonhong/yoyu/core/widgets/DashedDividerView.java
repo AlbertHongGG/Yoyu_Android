@@ -1,6 +1,7 @@
 package com.jasonhong.yoyu.core.widgets;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
@@ -14,14 +15,14 @@ import com.jasonhong.yoyu.R;
 
 /**
  * Pixel-perfect reproduction of Flutter's DashedDivider:
- * Height: 1dp, dashWidth: 5dp, color: Colors.black12 (#1F000000), spaceBetween layout.
- * Draws via pure hardware-accelerated canvas rectangles.
+ * Height: 1dp, dashWidth: 5dp, color: Colors.black12 / white12, spaceBetween layout.
+ * Draws crisp, hardware-accelerated dashes with exact pixel snapping.
  */
 public class DashedDividerView extends View {
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private float dashWidthPx;
-    private float strokeHeightPx;
+    private int strokeHeightPx;
 
     public DashedDividerView(Context context) {
         super(context);
@@ -40,10 +41,11 @@ public class DashedDividerView extends View {
 
     private void init(Context context, @Nullable AttributeSet attrs) {
         dashWidthPx = dpToPx(5f);
-        strokeHeightPx = dpToPx(1f);
+        strokeHeightPx = Math.max(1, Math.round(dpToPx(1f)));
 
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(ContextCompat.getColor(context, R.color.tx_divider));
+        boolean isDark = (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        paint.setColor(ContextCompat.getColor(context, isDark ? R.color.tx_divider_dark : R.color.tx_divider));
     }
 
     public void setDividerColor(int color) {
@@ -53,8 +55,7 @@ public class DashedDividerView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int desiredHeight = (int) Math.ceil(strokeHeightPx);
-        int height = resolveSize(desiredHeight, heightMeasureSpec);
+        int height = resolveSize(strokeHeightPx, heightMeasureSpec);
         setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec), height);
     }
 
@@ -62,7 +63,8 @@ public class DashedDividerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         float width = getWidth();
-        if (width <= 0 || dashWidthPx <= 0) return;
+        float height = getHeight();
+        if (width <= 0 || height <= 0 || dashWidthPx <= 0) return;
 
         int dashCount = (int) Math.floor(width / (2 * dashWidthPx));
         if (dashCount <= 0) return;
@@ -71,12 +73,9 @@ public class DashedDividerView extends View {
                 ? (width - (dashCount * dashWidthPx)) / (dashCount - 1)
                 : 0f;
 
-        float top = (getHeight() - strokeHeightPx) / 2f;
-        float bottom = top + strokeHeightPx;
-
         float currentX = 0f;
         for (int i = 0; i < dashCount; i++) {
-            canvas.drawRect(currentX, top, currentX + dashWidthPx, bottom, paint);
+            canvas.drawRect(currentX, 0f, currentX + dashWidthPx, height, paint);
             currentX += dashWidthPx + gap;
         }
     }
