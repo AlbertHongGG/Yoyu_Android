@@ -104,4 +104,11 @@
 
     </FrameLayout>
 
+    <!-- Card Drag Overlay (Top-most layer for floating card) -->
+    <com.jasonhong.yoyu.presentation.home.drag.CardDragOverlayView
+        android:id="@+id/dragOverlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </RelativeLayout>
