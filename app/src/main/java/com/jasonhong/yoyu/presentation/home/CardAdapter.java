@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.facebook.shimmer.ShimmerDrawable;
-import com.jasonhong.yoyu.core.widgets.ShimmerHelper;
+import com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable;
 import com.jasonhong.yoyu.databinding.ItemCardBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
 
@@ -103,13 +102,13 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
             binding.tagRegistered.setVisibility(card.isRegister() ? View.VISIBLE : View.GONE);
 
-            // Load Card Face with metallic shimmer
-            ShimmerDrawable shimmer = ShimmerHelper.createMetallicShimmer(itemView.getContext());
+            // Load Card Face with gentle breathing skeleton
+            SkeletonPulseDrawable placeholder = new SkeletonPulseDrawable(itemView.getContext(), 0f);
             Glide.with(itemView.getContext())
                     .load(card.getCardFaceUrl())
                     .transition(DrawableTransitionOptions.withCrossFade(200))
                     .centerCrop()
-                    .placeholder(shimmer)
+                    .placeholder(placeholder)
                     .error(new ColorDrawable(android.graphics.Color.parseColor("#33888888")))
                     .into(binding.ivCardFace);
 

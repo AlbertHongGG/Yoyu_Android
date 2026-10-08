@@ -62,10 +62,4 @@
     <color name="divider_dark">#1FFFFFFF</color>
     <color name="tx_divider">#26000000</color>
     <color name="tx_divider_dark">#26FFFFFF</color>
-
-    <!-- Metallic Shimmer Palette -->
-    <color name="shimmer_base_light">#EAEFF5</color>
-    <color name="shimmer_highlight_light">#FFFFFF</color>
-    <color name="shimmer_base_dark">#242424</color>
-    <color name="shimmer_highlight_dark">#3D3D3D</color>
 </resources>

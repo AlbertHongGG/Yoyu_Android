@@ -46,15 +46,12 @@ public class TransactionHistoryFragment extends Fragment {
         binding.rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvTransactions.setAdapter(adapter);
 
-        binding.swipeRefreshDetail.setOnRefreshListener(() -> viewModel.loadData());
-
         observeViewModel();
     }
 
     private void observeViewModel() {
         viewModel.getRawTransactionsResource().observe(getViewLifecycleOwner(), res -> {
             if (res == null) return;
-            binding.swipeRefreshDetail.setRefreshing(res.getStatus() == Resource.Status.LOADING);
             if (res.getStatus() == Resource.Status.ERROR && res.getMessage() != null && getContext() != null) {
                 NotificationToast.showError(requireActivity(), res.getMessage());
             }

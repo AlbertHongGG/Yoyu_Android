@@ -9,18 +9,49 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.jasonhong.yoyu.core.widgets.NotificationToast;
+import com.jasonhong.yoyu.core.widgets.swipeback.SwipeBackLayout;
+import com.jasonhong.yoyu.core.widgets.swipeback.SwipeBackListener;
 
 public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActivity {
 
     protected VB binding;
+    protected SwipeBackLayout swipeBackLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = inflateBinding(getLayoutInflater());
         setContentView(binding.getRoot());
+        if (enableSwipeBack()) {
+            setupSwipeBack();
+        }
         initView();
         initData();
+    }
+
+    protected boolean enableSwipeBack() {
+        return true;
+    }
+
+    private void setupSwipeBack() {
+        swipeBackLayout = new SwipeBackLayout(this);
+        swipeBackLayout.attachToActivity(this, new SwipeBackListener() {
+            @Override
+            public void onSwipeProgress(float progress) {
+                // Hook for subclass if needed
+            }
+
+            @Override
+            public void onSwipeCancel() {
+                // Hook for subclass if needed
+            }
+
+            @Override
+            public void onSwipeFinished() {
+                finish();
+                overridePendingTransition(0, 0);
+            }
+        });
     }
 
     protected abstract VB inflateBinding(LayoutInflater inflater);

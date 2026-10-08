@@ -32,12 +32,12 @@
         <activity
             android:name=".presentation.cardface.CardFacePickerActivity"
             android:exported="false"
-            android:theme="@style/Theme.Yoyu" />
+            android:theme="@style/Theme.Yoyu.SwipeBack" />
 
         <activity
             android:name=".presentation.detail.CardDetailActivity"
             android:exported="false"
-            android:theme="@style/Theme.Yoyu" />
+            android:theme="@style/Theme.Yoyu.SwipeBack" />
 
     </application>
 

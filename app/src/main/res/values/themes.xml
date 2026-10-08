@@ -29,4 +29,18 @@
         <item name="android:statusBarColor">#FFFFFF</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+
+    <!-- Activity with Swipe-to-Back Theme (Translucent window + Cupertino transitions) -->
+    <style name="Theme.Yoyu.SwipeBack" parent="Theme.Yoyu">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Yoyu.SwipeBack</item>
+    </style>
+
+    <style name="Animation.Yoyu.SwipeBack" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/hold</item>
+        <item name="android:activityCloseEnterAnimation">@anim/hold_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
 </resources>

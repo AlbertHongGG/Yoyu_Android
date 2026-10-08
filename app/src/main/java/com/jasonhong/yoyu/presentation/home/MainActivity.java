@@ -33,14 +33,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
     }
 
     @Override
+    protected boolean enableSwipeBack() {
+        return false;
+    }
+
+    @Override
     protected void initView() {
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         adapter = new CardAdapter(this);
         binding.rvCards.setLayoutManager(new LinearLayoutManager(this));
         binding.rvCards.setAdapter(adapter);
-
-        binding.swipeRefresh.setOnRefreshListener(() -> viewModel.refresh());
 
         // Setup Drag Target (Trash Action)
         int defaultColor = ContextCompat.getColor(this, R.color.text_secondary_light);
@@ -72,7 +75,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
     protected void initData() {
         viewModel.getCardsLiveData().observe(this, resource -> {
             if (resource == null) return;
-            binding.swipeRefresh.setRefreshing(resource.isLoading());
 
             List<CardEntity> cards = resource.data;
             if (cards == null || cards.isEmpty()) {

@@ -77,7 +77,6 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         if (isLoading || !hasNext) return;
 
         isLoading = true;
-        binding.pbLoadingMore.setVisibility(View.VISIBLE);
 
         int startIndex = currentPage * PAGE_SIZE;
         int endIndex = Math.min(startIndex + PAGE_SIZE, CardFaceConstants.ALLOWED_IMAGE_IDS.length);
@@ -93,9 +92,8 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
 
         // Post to adapter
         binding.rvCardFaces.post(() -> {
-            adapter.addUrls(batchUrls);
+            adapter.addUrls(batchUrls, hasNext);
             isLoading = false;
-            binding.pbLoadingMore.setVisibility(View.GONE);
         });
     }
 
