@@ -69,8 +69,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
     protected void initView() {
         card = (CardEntity) getIntent().getSerializableExtra("card");
         if (card == null) {
-            finish();
-            return;
+            card = new CardEntity("77050067379", "我的卡片", AppConstants.DEFAULT_CARD_FACE_URL, 291.0, false);
         }
 
         cardRepository = new CardRepositoryImpl(this);
@@ -175,6 +174,33 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
     }
 
     @Override
+    public void onCardFaceLongClick(View sourceView, CardFaceItem item, int position) {
+        triggerHaptic(40);
+        com.jasonhong.yoyu.presentation.showcase.CardShowcaseLauncher.show(
+                this,
+                sourceView,
+                item,
+                new com.jasonhong.yoyu.presentation.showcase.CardShowcaseDialog.OnShowcaseActionListener() {
+                    @Override
+                    public void onFavoriteToggled(com.jasonhong.yoyu.presentation.showcase.model.CardShowcaseItem showcaseItem, boolean isFavorite) {
+                        favoriteRepository.toggleFavorite(showcaseItem.getId());
+                        item.setFavorite(isFavorite);
+                        if (isFavoriteMode) {
+                            loadFavoritesList();
+                        } else {
+                            adapter.notifyFavoriteChanged(position, isFavorite);
+                        }
+                    }
+
+                    @Override
+                    public void onApplyCover(com.jasonhong.yoyu.presentation.showcase.model.CardShowcaseItem showcaseItem) {
+                        onCardFaceClick(item);
+                    }
+                }
+        );
+    }
+
+    @Override
     public void onFavoriteToggle(CardFaceItem item, int position) {
         triggerHaptic();
         boolean newFav = favoriteRepository.toggleFavorite(item.getId());
@@ -199,12 +225,16 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
     }
 
     private void triggerHaptic() {
+        triggerHaptic(20);
+    }
+
+    private void triggerHaptic(int ms) {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE));
+                vibrator.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
-                vibrator.vibrate(20);
+                vibrator.vibrate(ms);
             }
         }
     }

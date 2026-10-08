@@ -31,7 +31,7 @@
 
         <activity
             android:name=".presentation.cardface.CardFacePickerActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/Theme.Yoyu.SwipeBack" />
 
         <activity

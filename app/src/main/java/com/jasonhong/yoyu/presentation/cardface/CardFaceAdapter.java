@@ -40,6 +40,7 @@ public class CardFaceAdapter extends RecyclerView.Adapter<CardFaceAdapter.CardFa
 
     public interface OnCardFaceClickListener {
         void onCardFaceClick(CardFaceItem item);
+        void onCardFaceLongClick(View sourceView, CardFaceItem item, int position);
         void onFavoriteToggle(CardFaceItem item, int position);
         void onCopyId(CardFaceItem item);
     }
@@ -156,8 +157,17 @@ public class CardFaceAdapter extends RecyclerView.Adapter<CardFaceAdapter.CardFa
             View.OnClickListener cardClickListener = v -> {
                 if (listener != null) listener.onCardFaceClick(item);
             };
+            View.OnLongClickListener cardLongClickListener = v -> {
+                if (listener != null) {
+                    listener.onCardFaceLongClick(binding.cardFaceContainer, item, getBindingAdapterPosition());
+                    return true;
+                }
+                return false;
+            };
             binding.cardFaceContainer.setOnClickListener(cardClickListener);
+            binding.cardFaceContainer.setOnLongClickListener(cardLongClickListener);
             binding.ivFace.setOnClickListener(cardClickListener);
+            binding.ivFace.setOnLongClickListener(cardLongClickListener);
 
             binding.btnFavorite.setOnClickListener(v -> {
                 binding.btnFavorite.animate()
