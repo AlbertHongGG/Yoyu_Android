@@ -9,26 +9,34 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.ListPreloader;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.jasonhong.yoyu.R;
-import com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable;
 import com.jasonhong.yoyu.databinding.ItemCardFaceBinding;
-import com.jasonhong.yoyu.databinding.ItemCardFaceSkeletonBinding;
 import com.jasonhong.yoyu.domain.model.CardFaceItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    private static final int TYPE_CARD = 0;
-    private static final int TYPE_SKELETON = 1;
+/**
+ * Adapter for card face selection grid:
+ * - Implements ListPreloader.PreloadModelProvider for zero-latency lookahead prefetching.
+ * - Optimized with DiskCacheStrategy.ALL and lightweight placeholders.
+ * - Handles favorite toggle with payload updates for flicker-free interaction.
+ */
+public class CardFaceAdapter extends RecyclerView.Adapter<CardFaceAdapter.CardFaceViewHolder>
+        implements ListPreloader.PreloadModelProvider<CardFaceItem> {
 
     public interface OnCardFaceClickListener {
         void onCardFaceClick(CardFaceItem item);
@@ -36,30 +44,28 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onCopyId(CardFaceItem item);
     }
 
+    private final Context context;
     private final List<CardFaceItem> items = new ArrayList<>();
     private final String selectedUrl;
     private final OnCardFaceClickListener listener;
-    private boolean hasNext = true;
+    private final ColorDrawable placeholderDrawable = new ColorDrawable(Color.parseColor("#14000000"));
+    private final ColorDrawable errorDrawable = new ColorDrawable(Color.parseColor("#22888888"));
 
-    public CardFaceAdapter(String selectedUrl, OnCardFaceClickListener listener) {
+    private final ViewPreloadSizeProvider<CardFaceItem> sizeProvider;
+
+    public CardFaceAdapter(Context context, String selectedUrl, OnCardFaceClickListener listener,
+                           ViewPreloadSizeProvider<CardFaceItem> sizeProvider) {
+        this.context = context;
         this.selectedUrl = selectedUrl != null ? selectedUrl : "";
         this.listener = listener;
+        this.sizeProvider = sizeProvider;
     }
 
-    public void setItems(List<CardFaceItem> newItems, boolean hasNext) {
+    public void setItems(List<CardFaceItem> newItems) {
         this.items.clear();
         if (newItems != null) {
             this.items.addAll(newItems);
         }
-        this.hasNext = hasNext;
-        notifyDataSetChanged();
-    }
-
-    public void addItems(List<CardFaceItem> newItems, boolean hasNext) {
-        if (newItems != null && !newItems.isEmpty()) {
-            this.items.addAll(newItems);
-        }
-        this.hasNext = hasNext;
         notifyDataSetChanged();
     }
 
@@ -74,38 +80,44 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return items;
     }
 
+    @NonNull
     @Override
-    public int getItemViewType(int position) {
-        if (position < items.size()) {
-            return TYPE_CARD;
+    public List<CardFaceItem> getPreloadItems(int position) {
+        if (position >= 0 && position < items.size()) {
+            return Collections.singletonList(items.get(position));
         }
-        return TYPE_SKELETON;
+        return Collections.emptyList();
+    }
+
+    @Nullable
+    @Override
+    public RequestBuilder<?> getPreloadRequestBuilder(@NonNull CardFaceItem item) {
+        return Glide.with(context)
+                .load(item.getUrl())
+                .transform(new Rotate(90), new CenterCrop())
+                .diskCacheStrategy(DiskCacheStrategy.ALL);
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        if (viewType == TYPE_CARD) {
-            ItemCardFaceBinding binding = ItemCardFaceBinding.inflate(inflater, parent, false);
-            return new CardFaceViewHolder(binding);
-        } else {
-            ItemCardFaceSkeletonBinding binding = ItemCardFaceSkeletonBinding.inflate(inflater, parent, false);
-            return new SkeletonViewHolder(binding);
+    public CardFaceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemCardFaceBinding binding = ItemCardFaceBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
+        if (sizeProvider != null) {
+            sizeProvider.setView(binding.ivFace);
         }
+        return new CardFaceViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof CardFaceViewHolder) {
-            ((CardFaceViewHolder) holder).bind(items.get(position));
-        }
+    public void onBindViewHolder(@NonNull CardFaceViewHolder holder, int position) {
+        holder.bind(items.get(position));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
-        if (!payloads.isEmpty() && holder instanceof CardFaceViewHolder) {
-            ((CardFaceViewHolder) holder).updateFavoriteUI(items.get(position));
+    public void onBindViewHolder(@NonNull CardFaceViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty()) {
+            holder.updateFavoriteUI(items.get(position));
         } else {
             super.onBindViewHolder(holder, position, payloads);
         }
@@ -113,10 +125,7 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        if (items.isEmpty()) {
-            return hasNext ? 15 : 0; // Initial 15 skeleton cards (5 rows of 3)
-        }
-        return items.size() + (hasNext ? 6 : 0); // Extra 6 skeleton cards at end
+        return items.size();
     }
 
     class CardFaceViewHolder extends RecyclerView.ViewHolder {
@@ -128,21 +137,20 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         void bind(CardFaceItem item) {
-            Context context = itemView.getContext();
+            Context ctx = itemView.getContext();
             boolean isSelected = item.getUrl().equals(selectedUrl);
             binding.layoutSelectedOverlay.setVisibility(isSelected ? View.VISIBLE : View.GONE);
 
             binding.tvCardFaceId.setText(item.getFormattedId());
             updateFavoriteUI(item);
 
-            SkeletonPulseDrawable placeholder = new SkeletonPulseDrawable(context, 16f);
-
-            Glide.with(context)
+            Glide.with(ctx)
                     .load(item.getUrl())
                     .transform(new Rotate(90), new CenterCrop())
-                    .transition(DrawableTransitionOptions.withCrossFade(200))
-                    .placeholder(placeholder)
-                    .error(new ColorDrawable(Color.parseColor("#33888888")))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transition(DrawableTransitionOptions.withCrossFade(120))
+                    .placeholder(placeholderDrawable)
+                    .error(errorDrawable)
                     .into(binding.ivFace);
 
             View.OnClickListener cardClickListener = v -> {
@@ -169,22 +177,14 @@ public class CardFaceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         void updateFavoriteUI(CardFaceItem item) {
-            Context context = itemView.getContext();
+            Context ctx = itemView.getContext();
             if (item.isFavorite()) {
                 binding.btnFavorite.setImageResource(R.drawable.ic_favorite_filled);
-                binding.btnFavorite.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.expense_red)));
+                binding.btnFavorite.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.expense_red)));
             } else {
                 binding.btnFavorite.setImageResource(R.drawable.ic_favorite_border);
-                binding.btnFavorite.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_hint_light)));
+                binding.btnFavorite.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.text_hint_light)));
             }
-        }
-    }
-
-    static class SkeletonViewHolder extends RecyclerView.ViewHolder {
-        SkeletonViewHolder(ItemCardFaceSkeletonBinding binding) {
-            super(binding.getRoot());
-            SkeletonPulseDrawable pulse = new SkeletonPulseDrawable(itemView.getContext(), 16f);
-            binding.viewSkeleton.setBackground(pulse);
         }
     }
 }

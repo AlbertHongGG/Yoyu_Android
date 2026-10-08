@@ -5,18 +5,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
+import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.base.BaseActivity;
 import com.jasonhong.yoyu.core.constants.AppConstants;
@@ -33,21 +33,25 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerBinding> implements CardFaceAdapter.OnCardFaceClickListener {
-
-    private static final int PAGE_SIZE = 15;
+/**
+ * CardFacePickerActivity:
+ * - Natural virtualized data supply for full card catalog without artificial micro-batching.
+ * - Integrates Glide RecyclerViewPreloader for zero-latency lookahead image preloading.
+ * - Configured with RecyclerView view cache and fixed size optimizations.
+ * - Supports seamless favorite toggling and exact pixel scroll position restoration.
+ */
+public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerBinding>
+        implements CardFaceAdapter.OnCardFaceClickListener {
 
     private CardEntity card;
     private CardRepository cardRepository;
     private CardFaceFavoriteRepository favoriteRepository;
     private CardFaceAdapter adapter;
     private GridLayoutManager layoutManager;
+    private ViewPreloadSizeProvider<CardFaceItem> preloadSizeProvider;
 
-    // "All" mode paging and cached items
+    // Full catalog in "All" mode
     private final List<CardFaceItem> allItems = new ArrayList<>();
-    private int currentPage = 0;
-    private boolean isLoading = false;
-    private boolean hasNext = true;
 
     // Preserved scroll position for "All" mode
     private int allScrollPos = 0;
@@ -76,28 +80,35 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         binding.btnToggleFavorites.setOnClickListener(v -> toggleFavoriteMode());
 
         layoutManager = new GridLayoutManager(this, 3);
+        layoutManager.setInitialPrefetchItemCount(9);
         binding.rvCardFaces.setLayoutManager(layoutManager);
+        binding.rvCardFaces.setHasFixedSize(true);
+        binding.rvCardFaces.setItemViewCacheSize(18);
 
-        adapter = new CardFaceAdapter(card.getCardFaceUrl(), this);
+        // Preload size provider observes actual view dimensions on layout
+        preloadSizeProvider = new ViewPreloadSizeProvider<>();
+        adapter = new CardFaceAdapter(this, card.getCardFaceUrl(), this, preloadSizeProvider);
         binding.rvCardFaces.setAdapter(adapter);
 
-        binding.rvCardFaces.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (!isFavoriteMode && dy > 0 && !isLoading && hasNext) {
-                    int visibleItemCount = layoutManager.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+        // Preload ahead by 24 items in the scroll direction
+        RecyclerViewPreloader<CardFaceItem> preloader = new RecyclerViewPreloader<>(
+                Glide.with(this),
+                adapter,
+                preloadSizeProvider,
+                24
+        );
+        binding.rvCardFaces.addOnScrollListener(preloader);
 
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 6) {
-                        loadMore();
-                    }
-                }
-            }
-        });
+        loadAllCards();
+    }
 
-        loadMore();
+    private void loadAllCards() {
+        allItems.clear();
+        for (int id : CardFaceConstants.ALLOWED_IMAGE_IDS) {
+            boolean isFav = favoriteRepository.isFavorite(id);
+            allItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", isFav));
+        }
+        adapter.setItems(allItems);
     }
 
     private void toggleFavoriteMode() {
@@ -129,7 +140,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
             for (CardFaceItem item : allItems) {
                 item.setFavorite(favoriteRepository.isFavorite(item.getId()));
             }
-            adapter.setItems(allItems, hasNext);
+            adapter.setItems(allItems);
 
             // Seamlessly restore scroll position in "All" mode
             layoutManager.scrollToPositionWithOffset(allScrollPos, allScrollOffset);
@@ -141,7 +152,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         if (favIds.isEmpty()) {
             binding.layoutEmptyFavorites.setVisibility(View.VISIBLE);
             binding.rvCardFaces.setVisibility(View.GONE);
-            adapter.setItems(Collections.emptyList(), false);
+            adapter.setItems(Collections.emptyList());
         } else {
             binding.layoutEmptyFavorites.setVisibility(View.GONE);
             binding.rvCardFaces.setVisibility(View.VISIBLE);
@@ -149,36 +160,9 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
             for (Integer id : favIds) {
                 favItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", true));
             }
-            adapter.setItems(favItems, false);
+            adapter.setItems(favItems);
             layoutManager.scrollToPositionWithOffset(0, 0);
         }
-    }
-
-    private void loadMore() {
-        if (isLoading || !hasNext) return;
-
-        isLoading = true;
-
-        int startIndex = currentPage * PAGE_SIZE;
-        int endIndex = Math.min(startIndex + PAGE_SIZE, CardFaceConstants.ALLOWED_IMAGE_IDS.length);
-
-        List<CardFaceItem> batchItems = new ArrayList<>();
-        for (int i = startIndex; i < endIndex; i++) {
-            int id = CardFaceConstants.ALLOWED_IMAGE_IDS[i];
-            boolean isFav = favoriteRepository.isFavorite(id);
-            batchItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", isFav));
-        }
-
-        allItems.addAll(batchItems);
-        currentPage++;
-        hasNext = endIndex < CardFaceConstants.ALLOWED_IMAGE_IDS.length;
-
-        binding.rvCardFaces.post(() -> {
-            if (!isFavoriteMode) {
-                adapter.addItems(batchItems, hasNext);
-            }
-            isLoading = false;
-        });
     }
 
     @Override
