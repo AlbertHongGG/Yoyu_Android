@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Yoyu</string>
+    <string name="title_home">Yoyu 一卡通</string>
+    <string name="no_cards_title">目前尚未綁定任何卡片</string>
+    <string name="no_cards_subtitle">點擊下方按鈕新增您的第一張一卡通</string>
+    <string name="add_card">新增卡片</string>
+    <string name="card_no_hint">請輸入 11 碼或 16 碼卡號</string>
+    <string name="card_name_hint">自訂卡片名稱 (預設: 我的卡片)</string>
+    <string name="default_card_name">我的卡片</string>
+    <string name="registered_tag">記名</string>
+    <string name="choose_card_face">選擇卡片封面</string>
+    <string name="tab_transactions">交易紀錄</string>
+    <string name="tab_analysis">分析</string>
+    <string name="no_transactions">無交易紀錄</string>
+    <string name="filter_partner_title">合作夥伴過濾</string>
+    <string name="filter_all">全部</string>
+    <string name="filter_date_range_title">時間區段篩選</string>
+    <string name="search_hint">搜尋站點、加值...</string>
+    <string name="select_start_time">選擇起始時間</string>
+    <string name="select_end_time">選擇結束時間</string>
+    <string name="total_expense">總支出</string>
+    <string name="total_top_up">總加值</string>
+    <string name="total_auto_top_up">總自動加值</string>
+    <string name="segment_expense">支出</string>
+    <string name="segment_top_up">加值</string>
+    <string name="segment_auto_top_up">自動加值</string>
+    <string name="no_data_in_range">此區間無資料</string>
+    <string name="retry">重試</string>
+</resources>

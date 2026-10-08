@@ -1,0 +1,81 @@
+# ==========================================
+# Gradle & Build Output
+# ==========================================
+.gradle/
+build/
+**/build/
+buildOutputCleanup/
+
+# ==========================================
+# Built Application Packages & Binaries
+# ==========================================
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+/out/
+
+# ==========================================
+# Local Machine Configurations
+# ==========================================
+# Contains local Android SDK path and machine-specific configs
+local.properties
+
+# ==========================================
+# IDE & Editors
+# ==========================================
+# Android Studio & IntelliJ IDEA
+*.iml
+.idea/
+*.ipr
+*.iws
+.navigation/
+captures/
+
+# Visual Studio Code
+.vscode/
+
+# Fleet
+.fleet/
+
+# ==========================================
+# Keystore & Signing Credentials
+# ==========================================
+*.jks
+*.keystore
+*.p12
+*.bks
+key.properties
+signing.properties
+
+# ==========================================
+# Native Build Caches
+# ==========================================
+.externalNativeBuild/
+.cxx/
+
+# ==========================================
+# Log & Dump Files
+# ==========================================
+*.log
+*.hprof
+
+# ==========================================
+# OS Specific Files
+# ==========================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+[Tt]humbs.db
+[Dd]esktop.ini
+ehthumbs.db
+ehthumbs_vista.db
