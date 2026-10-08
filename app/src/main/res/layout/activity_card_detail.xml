@@ -129,57 +129,12 @@
 
     </RelativeLayout>
 
-    <!-- Main Content Tabs -->
-    <FrameLayout
-        android:id="@+id/tabContentContainer"
+    <!-- Main ViewPager2 for Tab Pages -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerDetail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/appBarLayout">
-
-        <!-- Tab 0: Transactions History List -->
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshDetail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTransactions"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingStart="16dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingBottom="100dp"
-                    tools:listitem="@layout/item_transaction_transit" />
-
-                <TextView
-                    android:id="@+id/tvTransactionsEmpty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="@string/no_transactions"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="16sp"
-                    android:visibility="gone" />
-
-            </FrameLayout>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <!-- Tab 1: Transaction Analysis -->
-        <include
-            android:id="@+id/layoutAnalysis"
-            layout="@layout/view_transaction_analysis"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-    </FrameLayout>
+        android:layout_below="@id/appBarLayout" />
 
     <!-- Animated Floating Tab Bar (Bottom Center) -->
     <com.jasonhong.yoyu.core.widgets.AnimatedFloatingTabBar
