@@ -18,6 +18,8 @@
     <string name="search_hint">搜尋站點、加值...</string>
     <string name="select_start_time">選擇起始時間</string>
     <string name="select_end_time">選擇結束時間</string>
+    <string name="start_time">起始時間</string>
+    <string name="end_time">結束時間</string>
     <string name="total_expense">總支出</string>
     <string name="total_top_up">總加值</string>
     <string name="total_auto_top_up">總自動加值</string>

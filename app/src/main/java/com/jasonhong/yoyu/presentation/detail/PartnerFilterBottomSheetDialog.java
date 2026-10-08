@@ -56,9 +56,9 @@ public class PartnerFilterBottomSheetDialog extends BottomSheetDialogFragment {
 
         List<OptionItem> options = new ArrayList<>();
         // "全部" is always first
-        options.add(new OptionItem(null, getString(R.string.filter_all), R.drawable.ic_filter));
+        options.add(new OptionItem(null, getString(R.string.filter_all), R.drawable.ic_all_inclusive));
         for (String p : partners) {
-            options.add(new OptionItem(p, p, ScopeIconMapper.getIconForScope(p)));
+            options.add(new OptionItem(p, p, R.drawable.ic_directions_bus_filled_rounded));
         }
 
         PartnerAdapter adapter = new PartnerAdapter(options, selectedPartner, item -> {

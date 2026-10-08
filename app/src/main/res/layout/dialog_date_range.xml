@@ -223,119 +223,133 @@
 
     </HorizontalScrollView>
 
-    <!-- Date Input Boxes Row -->
-    <LinearLayout
+    <!-- Date Input Boxes Section -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
+
+        <!-- Start Label -->
+        <TextView
+            android:id="@+id/tvStartLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start_time"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="@+id/boxStartDate"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Start Date Box -->
         <LinearLayout
             android:id="@+id/boxStartDate"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_input_box"
             android:clickable="true"
             android:focusable="true"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/ivArrowForward"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvStartLabel">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_calendar_today_rounded"
+                app:tint="@color/primary" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tvDateRangeStart"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/select_start_time"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_box"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_date_range_rounded"
-                    app:tint="@color/primary" />
-
-                <TextView
-                    android:id="@+id/tvDateRangeStart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="2026/07/08" />
-
-            </LinearLayout>
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:autoSizeMaxTextSize="15sp"
+                app:autoSizeMinTextSize="11sp"
+                app:autoSizeStepGranularity="0.5sp"
+                app:autoSizeTextType="uniform"
+                tools:text="2026/07/08" />
 
         </LinearLayout>
 
-        <!-- Forward Arrow -->
+        <!-- Forward Arrow: mathematically centered to the input box -->
         <ImageView
+            android:id="@+id/ivArrowForward"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="12dp"
             android:src="@drawable/ic_arrow_forward"
+            app:layout_constraintBottom_toBottomOf="@+id/boxStartDate"
+            app:layout_constraintEnd_toStartOf="@+id/boxEndDate"
+            app:layout_constraintStart_toEndOf="@+id/boxStartDate"
+            app:layout_constraintTop_toTopOf="@+id/boxStartDate"
             app:tint="?android:attr/textColorSecondary" />
+
+        <!-- End Label -->
+        <TextView
+            android:id="@+id/tvEndLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/end_time"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="@+id/boxEndDate"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- End Date Box -->
         <LinearLayout
             android:id="@+id/boxEndDate"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_box"
             android:clickable="true"
             android:focusable="true"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ivArrowForward"
+            app:layout_constraintTop_toBottomOf="@+id/tvEndLabel">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_calendar_today_rounded"
+                app:tint="@color/primary" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tvDateRangeEnd"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/select_end_time"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_input_box"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_date_range_rounded"
-                    app:tint="@color/primary" />
-
-                <TextView
-                    android:id="@+id/tvDateRangeEnd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="2026/10/08" />
-
-            </LinearLayout>
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:autoSizeMaxTextSize="15sp"
+                app:autoSizeMinTextSize="11sp"
+                app:autoSizeStepGranularity="0.5sp"
+                app:autoSizeTextType="uniform"
+                tools:text="2026/10/08" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
