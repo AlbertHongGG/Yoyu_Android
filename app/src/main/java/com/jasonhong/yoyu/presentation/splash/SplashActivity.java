@@ -10,12 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.ComponentActivity;
 
 import com.jasonhong.yoyu.databinding.ActivitySplashBinding;
 import com.jasonhong.yoyu.presentation.home.MainActivity;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends ComponentActivity {
 
     private ActivitySplashBinding binding;
 

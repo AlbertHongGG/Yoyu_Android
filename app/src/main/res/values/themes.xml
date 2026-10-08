@@ -23,10 +23,13 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <!-- Splash Theme -->
-    <style name="Theme.Yoyu.Splash" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowBackground">#FFFFFF</item>
-        <item name="android:statusBarColor">#FFFFFF</item>
+    <!-- Launch Theme for Splash Activity (Suppresses system splash window, translucent) -->
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
