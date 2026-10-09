@@ -19,7 +19,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
-import android.widget.Toast;
+import com.jasonhong.yoyu.core.widgets.NotificationToast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,7 +57,7 @@ public class CardShowcaseDialog extends Dialog {
     public CardShowcaseDialog(@NonNull Activity activity,
                               @NonNull CardShowcaseItem item,
                               @Nullable OnShowcaseFavoriteListener listener) {
-        super(activity, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        super(activity, R.style.Theme_Yoyu_Showcase);
         this.activity = activity;
         this.item = item;
         this.favoriteListener = listener;
@@ -101,7 +101,7 @@ public class CardShowcaseDialog extends Dialog {
             if (clipboard != null) {
                 ClipData clip = ClipData.newPlainText("CardFace ID", item.getFormattedId());
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(activity, "已複製卡面 ID " + item.getFormattedId(), Toast.LENGTH_SHORT).show();
+                NotificationToast.showSuccess(binding.rootContainer, "已複製卡面 ID " + item.getFormattedId());
             }
         });
 

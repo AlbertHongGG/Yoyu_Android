@@ -46,4 +46,14 @@
         <item name="android:activityCloseEnterAnimation">@anim/hold_enter</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
+
+    <!-- Showcase Dialog Theme -->
+    <style name="Theme.Yoyu.Showcase" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="colorControlHighlight">#26FFFFFF</item>
+    </style>
 </resources>

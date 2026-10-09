@@ -9,7 +9,6 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -214,7 +213,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         if (clipboard != null) {
             ClipData clip = ClipData.newPlainText("CardFace ID", item.getFormattedId());
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(this, "已複製卡面 ID " + item.getFormattedId(), Toast.LENGTH_SHORT).show();
+            showSuccess("已複製卡面 ID " + item.getFormattedId());
         }
     }
 
