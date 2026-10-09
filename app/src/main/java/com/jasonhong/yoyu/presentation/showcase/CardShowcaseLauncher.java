@@ -20,7 +20,7 @@ public final class CardShowcaseLauncher {
     public static void show(@NonNull Activity activity,
                             @Nullable View sourceView,
                             @NonNull CardFaceItem item,
-                            @NonNull CardShowcaseDialog.OnShowcaseActionListener listener) {
+                            @Nullable CardShowcaseDialog.OnShowcaseFavoriteListener listener) {
         Rect bounds = null;
         if (sourceView != null) {
             int[] loc = new int[2];

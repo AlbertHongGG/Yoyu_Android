@@ -182,21 +182,13 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
                 this,
                 sourceView,
                 item,
-                new com.jasonhong.yoyu.presentation.showcase.CardShowcaseDialog.OnShowcaseActionListener() {
-                    @Override
-                    public void onFavoriteToggled(com.jasonhong.yoyu.presentation.showcase.model.CardShowcaseItem showcaseItem, boolean isFavorite) {
-                        favoriteRepository.toggleFavorite(showcaseItem.getId());
-                        item.setFavorite(isFavorite);
-                        if (isFavoriteMode) {
-                            loadFavoritesList();
-                        } else {
-                            adapter.notifyFavoriteChanged(position, isFavorite);
-                        }
-                    }
-
-                    @Override
-                    public void onApplyCover(com.jasonhong.yoyu.presentation.showcase.model.CardShowcaseItem showcaseItem) {
-                        onCardFaceClick(item);
+                (showcaseItem, isFavorite) -> {
+                    favoriteRepository.toggleFavorite(showcaseItem.getId());
+                    item.setFavorite(isFavorite);
+                    if (isFavoriteMode) {
+                        loadFavoritesList();
+                    } else {
+                        adapter.notifyFavoriteChanged(position, isFavorite);
                     }
                 }
         );

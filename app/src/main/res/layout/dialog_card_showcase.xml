@@ -5,7 +5,7 @@
     android:id="@+id/rootContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D908080C"
+    android:background="#D9090A10"
     android:clickable="true"
     android:clipChildren="false"
     android:clipToPadding="false"
@@ -18,34 +18,19 @@
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <!-- Top Close Button -->
-        <ImageView
-            android:id="@+id/btnCloseShowcase"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginTop="48dp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/bg_showcase_circle_btn"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp"
-            android:src="@drawable/ic_close"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#FFFFFF" />
-
-        <!-- 3D Card Anchor Container -->
+        <!-- 3D Card Anchor Container (Centered, optical balance bias 0.46) -->
         <FrameLayout
             android:id="@+id/cardAnchor"
-            android:layout_width="250dp"
+            android:layout_width="268dp"
             android:layout_height="0dp"
             android:clipChildren="false"
             android:clipToPadding="false"
-            app:layout_constraintBottom_toTopOf="@id/layoutControlBar"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="63:100"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnCloseShowcase">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.46">
 
             <com.jasonhong.yoyu.presentation.showcase.widget.Tilt3DCardView
                 android:id="@+id/tiltCardView"
@@ -54,84 +39,46 @@
 
         </FrameLayout>
 
-        <!-- Subtle Tilt Interaction Hint -->
-        <TextView
-            android:id="@+id/tvHintText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:fontFamily="sans-serif"
-            android:text="滑動傾斜探索 · 輕觸背景關閉"
-            android:textColor="#80FFFFFF"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardAnchor" />
-
-        <!-- Floating Control Bar at Bottom -->
+        <!-- Pure Floating Metadata Row (Transparent, unboxed, strictly matching card width) -->
         <LinearLayout
-            android:id="@+id/layoutControlBar"
-            android:layout_width="wrap_content"
-            android:layout_height="52dp"
-            android:layout_marginBottom="44dp"
-            android:background="@drawable/bg_showcase_bar"
-            android:clickable="true"
-            android:elevation="8dp"
-            android:focusable="true"
+            android:id="@+id/layoutShowcaseFooter"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingEnd="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:paddingStart="4dp"
+            android:paddingEnd="2dp"
+            app:layout_constraintEnd_toEndOf="@id/cardAnchor"
+            app:layout_constraintStart_toStartOf="@id/cardAnchor"
+            app:layout_constraintTop_toBottomOf="@id/cardAnchor">
 
-            <!-- Card ID -->
+            <!-- Card Face ID (clickable to copy) -->
             <TextView
                 android:id="@+id/tvShowcaseCardId"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                tools:text="#1011" />
+                android:textSize="17sp"
+                tools:text="#5609" />
 
-            <!-- Vertical Divider -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="14dp"
-                android:layout_marginEnd="10dp"
-                android:background="#33FFFFFF" />
-
-            <!-- Favorite Toggle Button -->
+            <!-- Favorite Toggle Icon (borderless) -->
             <ImageView
                 android:id="@+id/btnShowcaseFavorite"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="8dp"
                 android:src="@drawable/ic_favorite_border"
-                app:tint="#A0FFFFFF" />
-
-            <!-- Set as Cover Button -->
-            <TextView
-                android:id="@+id/btnApplyCover"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/bg_showcase_apply_btn"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="設為封面"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                app:tint="#B3FFFFFF" />
 
         </LinearLayout>
 
