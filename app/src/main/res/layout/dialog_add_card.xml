@@ -10,21 +10,42 @@
     android:paddingStart="20dp"
     android:paddingTop="12dp"
     android:paddingEnd="20dp"
-    android:paddingBottom="48dp">
+    android:paddingBottom="24dp">
 
     <!-- Drag Handle -->
     <View
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/bg_drag_handle" />
 
-    <!-- Header Row with Done Button -->
+    <!-- Header Row with Mode Toggle on Top-Left and Submit on Top-Right -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="12dp">
+
+        <FrameLayout
+            android:id="@+id/btnToggleMode"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivToggleMode"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/batch_mode_toggle_batch_tooltip"
+                android:src="@drawable/ic_batch_cards"
+                app:tint="@color/primary" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tvHeaderTitle"
@@ -64,69 +85,261 @@
 
     </RelativeLayout>
 
-    <!-- Card Number Input -->
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_input_box"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:overScrollMode="never">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_credit_card"
-            app:tint="@color/primary" />
-
-        <EditText
-            android:id="@+id/etCardNo"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="12dp"
-            android:background="@null"
-            android:fontFamily="monospace"
-            android:hint="@string/card_no_hint"
-            android:inputType="number"
-            android:letterSpacing="0.08"
-            android:maxLines="1"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textColorHint="?android:attr/textColorSecondary"
-            android:textSize="15sp" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <!-- Single Mode Inputs Container -->
+            <LinearLayout
+                android:id="@+id/layoutSingleInputs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    <!-- Card Name Input -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:background="@drawable/bg_input_box"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+                <!-- Card Number Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_input_box"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_badge"
-            app:tint="@color/primary" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_credit_card"
+                        app:tint="@color/primary" />
 
-        <EditText
-            android:id="@+id/etCardName"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="12dp"
-            android:background="@null"
-            android:hint="@string/card_name_hint"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textColorHint="?android:attr/textColorSecondary"
-            android:textSize="15sp" />
+                    <EditText
+                        android:id="@+id/etCardNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:background="@null"
+                        android:fontFamily="monospace"
+                        android:hint="@string/card_no_hint"
+                        android:inputType="number"
+                        android:letterSpacing="0.08"
+                        android:maxLines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textColorHint="?android:attr/textColorSecondary"
+                        android:textSize="15sp" />
 
-    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Card Name Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_box"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_badge"
+                        app:tint="@color/primary" />
+
+                    <EditText
+                        android:id="@+id/etCardName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:background="@null"
+                        android:hint="@string/card_name_hint"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textColorHint="?android:attr/textColorSecondary"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Batch Mode Inputs Container (Default Gone) -->
+            <LinearLayout
+                android:id="@+id/layoutBatchInputs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!-- Start Card Number Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_input_box"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_credit_card"
+                        app:tint="@color/primary" />
+
+                    <EditText
+                        android:id="@+id/etBatchStartCardNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:background="@null"
+                        android:fontFamily="monospace"
+                        android:hint="@string/batch_start_card_hint"
+                        android:inputType="number"
+                        android:letterSpacing="0.08"
+                        android:maxLines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textColorHint="?android:attr/textColorSecondary"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+                <!-- Batch Range Input (Count) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_input_box"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_list_alt_rounded"
+                        app:tint="@color/primary" />
+
+                    <EditText
+                        android:id="@+id/etBatchRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:background="@null"
+                        android:fontFamily="monospace"
+                        android:hint="@string/batch_range_hint"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textColorHint="?android:attr/textColorSecondary"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+                <!-- Live Preview Card -->
+                <LinearLayout
+                    android:id="@+id/layoutBatchPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_preview_box"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:id="@+id/tvPreviewTitle"
+                            style="@style/TextAppearance.Yoyu.SectionHeader"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:text="@string/batch_preview_title" />
+
+                        <TextView
+                            android:id="@+id/tvPreviewCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary"
+                            android:textSize="12sp"
+                            tools:text="共 100 張" />
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/tvPreviewRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.04"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="77050067379 ~ 77050067478" />
+
+                    <TextView
+                        android:id="@+id/tvPreviewTip"
+                        style="@style/TextAppearance.Yoyu.Subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/batch_preview_tip"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+
+                <!-- Batch Execution Progress (Visible during batch request) -->
+                <LinearLayout
+                    android:id="@+id/layoutBatchProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ProgressBar
+                        android:id="@+id/pbBatchProgress"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressBackgroundTint="@color/primary_light"
+                        android:progressTint="@color/primary" />
+
+                    <TextView
+                        android:id="@+id/tvBatchProgress"
+                        style="@style/TextAppearance.Yoyu.Subtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:textSize="12sp"
+                        tools:text="正在驗證卡片資料 (45/100)..." />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

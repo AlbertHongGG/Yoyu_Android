@@ -29,4 +29,11 @@
     <string name="no_data_in_range">此區間無資料</string>
     <string name="retry">重試</string>
     <string name="widget_card_4x2_description">以 4x2 滿版卡面即時展示一卡通封面、卡號與餘額，支援桌面點擊直接切換多張卡片。</string>
+    <string name="add_card_batch_title">連續批量新增</string>
+    <string name="batch_start_card_hint">請輸入起始卡號 (11 或 16 碼)</string>
+    <string name="batch_range_hint">連續數量 (1 ~ 500)</string>
+    <string name="batch_preview_title">即時預覽</string>
+    <string name="batch_preview_tip">預設名稱「我的卡片」，重複卡片自動跳過</string>
+    <string name="batch_mode_toggle_single_tooltip">切換為單張新增</string>
+    <string name="batch_mode_toggle_batch_tooltip">切換為連續批量新增</string>
 </resources>

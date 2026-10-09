@@ -9,12 +9,19 @@ import com.jasonhong.yoyu.data.api.IPassApiService;
 import com.jasonhong.yoyu.data.local.LocalCardStorage;
 import com.jasonhong.yoyu.data.model.remote.CheckMyCardsRequest;
 import com.jasonhong.yoyu.data.model.remote.CheckMyCardsResponse;
+import com.jasonhong.yoyu.domain.model.BatchCardOperationResult;
+import com.jasonhong.yoyu.domain.model.BatchCardSequenceGenerator;
 import com.jasonhong.yoyu.domain.model.CardEntity;
+import com.jasonhong.yoyu.domain.repository.BatchProgressListener;
 import com.jasonhong.yoyu.domain.repository.CardRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -135,6 +142,111 @@ public class CardRepositoryImpl implements CardRepository {
             current.add(finalCard);
             storage.saveCards(current);
             return finalCard;
+        }, executor);
+    }
+
+    @Override
+    public CompletableFuture<BatchCardOperationResult> batchAddCards(
+            String startCardNo,
+            int range,
+            BatchProgressListener progressListener
+    ) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<String> sequence = BatchCardSequenceGenerator.generate(startCardNo, range);
+            int total = sequence.size();
+
+            if (progressListener != null) {
+                progressListener.onProgress(0, total, "檢查既有卡片資料庫...");
+            }
+
+            List<CardEntity> current = storage.getCards();
+            Set<String> existingNumbers = new HashSet<>();
+            for (CardEntity c : current) {
+                existingNumbers.add(c.getCardNo());
+            }
+
+            List<String> duplicateCardNos = new ArrayList<>();
+            List<String> toQueryCardNos = new ArrayList<>();
+            for (String no : sequence) {
+                if (existingNumbers.contains(no)) {
+                    duplicateCardNos.add(no);
+                } else {
+                    toQueryCardNos.add(no);
+                }
+            }
+
+            int processedSoFar = duplicateCardNos.size();
+            if (progressListener != null) {
+                progressListener.onProgress(processedSoFar, total, "正在進行遠端驗證 (" + processedSoFar + "/" + total + ")");
+            }
+
+            List<CardEntity> addedCards = new ArrayList<>();
+            List<String> failedCardNos = new ArrayList<>();
+
+            final int CHUNK_SIZE = 25;
+            for (int i = 0; i < toQueryCardNos.size(); i += CHUNK_SIZE) {
+                int end = Math.min(i + CHUNK_SIZE, toQueryCardNos.size());
+                List<String> chunk = toQueryCardNos.subList(i, end);
+
+                try {
+                    Response<CheckMyCardsResponse> response = apiService.checkMyCards(new CheckMyCardsRequest(chunk)).execute();
+                    if (!response.isSuccessful() || response.body() == null) {
+                        failedCardNos.addAll(chunk);
+                    } else {
+                        CheckMyCardsResponse body = response.body();
+                        if (!"0".equals(body.getRtnCode())) {
+                            failedCardNos.addAll(chunk);
+                        } else {
+                            List<CheckMyCardsResponse.CardDataDto> dtos = body.getCardNos();
+                            Map<String, CheckMyCardsResponse.CardDataDto> dtoMap = new HashMap<>();
+                            if (dtos != null) {
+                                for (CheckMyCardsResponse.CardDataDto dto : dtos) {
+                                    if (dto != null && dto.getCardNo() != null) {
+                                        dtoMap.put(dto.getCardNo(), dto);
+                                    }
+                                }
+                            }
+
+                            for (String cardNo : chunk) {
+                                CheckMyCardsResponse.CardDataDto dto = dtoMap.get(cardNo);
+                                if (dto != null && "0".equals(dto.getErrCode())) {
+                                    String faceUrl = (dto.getCardImageUrl() != null && !dto.getCardImageUrl().isEmpty())
+                                            ? dto.getCardImageUrl()
+                                            : AppConstants.DEFAULT_CARD_FACE_URL;
+                                    CardEntity entity = new CardEntity(
+                                            dto.getCardNo(),
+                                            "我的卡片",
+                                            faceUrl,
+                                            dto.getLastTranSum(),
+                                            dto.isRegister()
+                                    );
+                                    addedCards.add(entity);
+                                } else {
+                                    failedCardNos.add(cardNo);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    failedCardNos.addAll(chunk);
+                }
+
+                processedSoFar += chunk.size();
+                if (progressListener != null) {
+                    progressListener.onProgress(processedSoFar, total, "正在進行遠端驗證 (" + processedSoFar + "/" + total + ")");
+                }
+            }
+
+            if (!addedCards.isEmpty()) {
+                current.addAll(addedCards);
+                storage.saveCards(current);
+            }
+
+            if (progressListener != null) {
+                progressListener.onProgress(total, total, "批量新增完成");
+            }
+
+            return new BatchCardOperationResult(addedCards, duplicateCardNos, failedCardNos, total);
         }, executor);
     }
 

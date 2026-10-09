@@ -16,6 +16,12 @@ public interface CardRepository {
 
     CompletableFuture<CardEntity> addCard(String cardNo, String cardName);
 
+    CompletableFuture<com.jasonhong.yoyu.domain.model.BatchCardOperationResult> batchAddCards(
+            String startCardNo,
+            int range,
+            BatchProgressListener progressListener
+    );
+
     CompletableFuture<Void> updateCard(CardEntity card);
 
     CompletableFuture<Void> removeCard(String cardNo);
