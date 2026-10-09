@@ -29,6 +29,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
     private CardAdapter adapter;
     private CardDragCoordinator dragCoordinator;
     private TrashActionTarget trashActionTarget;
+    private String pendingTargetCardNo = null;
 
     @Override
     protected ActivityMainBinding inflateBinding(LayoutInflater inflater) {
@@ -47,6 +48,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
         adapter = new CardAdapter(this);
         binding.rvCards.setLayoutManager(new LinearLayoutManager(this));
         binding.rvCards.setAdapter(adapter);
+
+        // Check initial launch intent for target card navigation
+        AppLaunchPayload payload = AppLaunchPayload.fromIntent(getIntent());
+        if (payload.hasTargetCard()) {
+            pendingTargetCardNo = payload.getTargetCardNo();
+            getIntent().removeExtra(AppLaunchPayload.EXTRA_TARGET_CARD_NO);
+        }
 
         // Setup Drag Target (Trash Action)
         int defaultColor = ContextCompat.getColor(this, R.color.text_secondary_light);
@@ -79,20 +87,32 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
         viewModel.getCardsLiveData().observe(this, resource -> {
             if (resource == null) return;
 
-            List<CardEntity> cards = resource.data;
-            if (cards == null || cards.isEmpty()) {
-                binding.layoutEmptyState.setVisibility(View.VISIBLE);
-                binding.rvCards.setVisibility(View.GONE);
-                adapter.submitList(null);
-            } else {
-                binding.layoutEmptyState.setVisibility(View.GONE);
-                binding.rvCards.setVisibility(View.VISIBLE);
-                adapter.submitList(cards);
-                handleTargetCard(getIntent());
-            }
-
-            if (resource.isError() && resource.message != null) {
-                showError(resource.message);
+            if (resource.isSuccess()) {
+                List<CardEntity> cards = resource.data;
+                if (cards == null || cards.isEmpty()) {
+                    binding.layoutEmptyState.setVisibility(View.VISIBLE);
+                    binding.rvCards.setVisibility(View.GONE);
+                    adapter.submitList(java.util.Collections.emptyList());
+                } else {
+                    binding.layoutEmptyState.setVisibility(View.GONE);
+                    binding.rvCards.setVisibility(View.VISIBLE);
+                    adapter.submitList(cards);
+                    consumePendingNavigation(cards);
+                }
+            } else if (resource.isLoading()) {
+                // Keep existing cards on screen smoothly without flicker or empty state
+                if (adapter.getItemCount() == 0 && (resource.data == null || resource.data.isEmpty())) {
+                    binding.layoutEmptyState.setVisibility(View.GONE);
+                    binding.rvCards.setVisibility(View.VISIBLE);
+                }
+            } else if (resource.isError()) {
+                if (resource.message != null) {
+                    showError(resource.message);
+                }
+                if (adapter.getItemCount() == 0) {
+                    binding.layoutEmptyState.setVisibility(View.VISIBLE);
+                    binding.rvCards.setVisibility(View.GONE);
+                }
             }
         });
     }
@@ -101,21 +121,24 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        handleTargetCard(intent);
-    }
-
-    private void handleTargetCard(Intent intent) {
-        if (intent == null || adapter == null) return;
         AppLaunchPayload payload = AppLaunchPayload.fromIntent(intent);
         if (payload.hasTargetCard()) {
-            String targetNo = payload.getTargetCardNo();
-            List<CardEntity> currentCards = adapter.getCards();
-            for (int i = 0; i < currentCards.size(); i++) {
-                if (targetNo != null && targetNo.equals(currentCards.get(i).getCardNo())) {
-                    final int position = i;
-                    binding.rvCards.post(() -> binding.rvCards.smoothScrollToPosition(position));
-                    break;
-                }
+            pendingTargetCardNo = payload.getTargetCardNo();
+            intent.removeExtra(AppLaunchPayload.EXTRA_TARGET_CARD_NO);
+            consumePendingNavigation(adapter.getCards());
+        }
+    }
+
+    private void consumePendingNavigation(List<CardEntity> cards) {
+        if (pendingTargetCardNo == null || cards == null || cards.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < cards.size(); i++) {
+            if (pendingTargetCardNo.equals(cards.get(i).getCardNo())) {
+                final int position = i;
+                binding.rvCards.post(() -> binding.rvCards.smoothScrollToPosition(position));
+                pendingTargetCardNo = null; // One-shot consumed
+                break;
             }
         }
     }
@@ -153,6 +176,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
     @Override
     protected void onResume() {
         super.onResume();
-        viewModel.loadCards();
+        viewModel.syncFromStorage();
     }
 }

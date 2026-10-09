@@ -40,7 +40,7 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull Application application) {
         super(application);
         this.cardRepository = new CardRepositoryImpl(application);
-        loadCards();
+        loadInitialCards();
     }
 
     public LiveData<Resource<List<CardEntity>>> getCardsLiveData() {
@@ -55,26 +55,49 @@ public class HomeViewModel extends AndroidViewModel {
         isDraggingLiveData.postValue(isDragging);
     }
 
-    public void loadCards() {
+    public void loadInitialCards() {
         cardsLiveData.postValue(Resource.loading());
         cardRepository.loadCards()
                 .thenAccept(localCards -> {
-                    cardsLiveData.postValue(Resource.success(localCards));
-                    // Silently refresh balances from network if there are cards
-                    if (localCards != null && !localCards.isEmpty()) {
-                        cardRepository.refreshCardsBalance(localCards)
-                                .thenAccept(updatedCards -> {
-                                    cardsLiveData.postValue(Resource.success(updatedCards));
-                                    notifyWidgetDataChanged();
-                                })
-                                .exceptionally(throwable -> null);
+                    List<CardEntity> safeList = localCards != null ? localCards : java.util.Collections.emptyList();
+                    cardsLiveData.postValue(Resource.success(safeList));
+                    if (!safeList.isEmpty()) {
+                        refreshBalancesSilently(safeList);
                     }
                 })
                 .exceptionally(throwable -> {
                     String msg = throwable.getCause() != null ? throwable.getCause().getMessage() : throwable.getMessage();
-                    cardsLiveData.postValue(Resource.error(msg != null ? msg : "載入失敗", new ArrayList<>()));
+                    cardsLiveData.postValue(Resource.error(msg != null ? msg : "載入失敗", java.util.Collections.emptyList()));
                     return null;
                 });
+    }
+
+    /**
+     * Silent synchronization from local storage (e.g. on onResume).
+     * Strictly verifies whether stored cards differ from in-memory cards.
+     * If identical: no-op (0 UI disruptions, 0 Diff calls, 0 network requests).
+     * If changed: emits new list directly without posting loading or firing network requests.
+     */
+    public void syncFromStorage() {
+        cardRepository.loadCards()
+                .thenAccept(localCards -> {
+                    List<CardEntity> current = cardsLiveData.getValue() != null ? cardsLiveData.getValue().data : null;
+                    List<CardEntity> safeLocal = localCards != null ? localCards : java.util.Collections.emptyList();
+                    if (current != null && current.equals(safeLocal)) {
+                        return;
+                    }
+                    cardsLiveData.postValue(Resource.success(safeLocal));
+                })
+                .exceptionally(throwable -> null);
+    }
+
+    private void refreshBalancesSilently(List<CardEntity> cards) {
+        cardRepository.refreshCardsBalance(cards)
+                .thenAccept(updatedCards -> {
+                    cardsLiveData.postValue(Resource.success(updatedCards));
+                    notifyWidgetDataChanged();
+                })
+                .exceptionally(throwable -> null);
     }
 
     public void refresh() {

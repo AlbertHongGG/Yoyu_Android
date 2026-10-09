@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -18,11 +19,10 @@ import com.jasonhong.yoyu.databinding.ItemCardBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
+public class CardAdapter extends ListAdapter<CardEntity, CardAdapter.CardViewHolder> {
 
     public interface OnCardClickListener {
         void onCardClick(CardEntity card);
@@ -30,49 +30,32 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         void onCardDragStart(CardEntity card, View itemView, float touchX, float touchY);
     }
 
-    private final List<CardEntity> cards = new ArrayList<>();
+    private static final DiffUtil.ItemCallback<CardEntity> DIFF_CALLBACK = new DiffUtil.ItemCallback<CardEntity>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull CardEntity oldItem, @NonNull CardEntity newItem) {
+            return oldItem.getCardNo().equals(newItem.getCardNo());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull CardEntity oldItem, @NonNull CardEntity newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
+
     private final OnCardClickListener listener;
     private final NumberFormat currencyFormat;
 
     public CardAdapter(OnCardClickListener listener) {
+        super(DIFF_CALLBACK);
         this.listener = listener;
         this.currencyFormat = NumberFormat.getCurrencyInstance(Locale.TAIWAN);
         this.currencyFormat.setMaximumFractionDigits(0);
         this.currencyFormat.setMinimumFractionDigits(0);
-    }
-
-    public void submitList(List<CardEntity> newCards) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-            @Override
-            public int getOldListSize() {
-                return cards.size();
-            }
-
-            @Override
-            public int getNewListSize() {
-                return newCards != null ? newCards.size() : 0;
-            }
-
-            @Override
-            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                return cards.get(oldItemPosition).getCardNo().equals(newCards.get(newItemPosition).getCardNo());
-            }
-
-            @Override
-            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return cards.get(oldItemPosition).equals(newCards.get(newItemPosition));
-            }
-        });
-
-        cards.clear();
-        if (newCards != null) {
-            cards.addAll(newCards);
-        }
-        diffResult.dispatchUpdatesTo(this);
+        setStateRestorationPolicy(StateRestorationPolicy.PREVENT_WHEN_EMPTY);
     }
 
     public List<CardEntity> getCards() {
-        return cards;
+        return getCurrentList();
     }
 
     @NonNull
@@ -84,12 +67,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
-        holder.bind(cards.get(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return cards.size();
+        holder.bind(getItem(position));
     }
 
     class CardViewHolder extends RecyclerView.ViewHolder {
