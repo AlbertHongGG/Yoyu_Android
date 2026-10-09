@@ -28,4 +28,5 @@
     <string name="segment_auto_top_up">自動加值</string>
     <string name="no_data_in_range">此區間無資料</string>
     <string name="retry">重試</string>
+    <string name="widget_card_4x2_description">以 4x2 滿版卡面即時展示一卡通封面、卡號與餘額，支援桌面點擊直接切換多張卡片。</string>
 </resources>

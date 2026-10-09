@@ -70,6 +70,10 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         diffResult.dispatchUpdatesTo(this);
     }
 
+    public List<CardEntity> getCards() {
+        return cards;
+    }
+
     @NonNull
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

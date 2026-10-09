@@ -3,7 +3,9 @@ package com.jasonhong.yoyu.presentation.cardface;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import com.jasonhong.yoyu.presentation.widget.CardAppWidgetProvider;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -170,6 +172,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
         triggerHaptic();
         CardEntity updated = card.copyWithCardFaceUrl(item.getUrl());
         cardRepository.updateCard(updated).thenAccept(v -> {
+            sendBroadcast(new Intent(CardAppWidgetProvider.ACTION_CARD_DATA_CHANGED).setPackage(getPackageName()));
             runOnUiThread(this::finish);
         });
     }

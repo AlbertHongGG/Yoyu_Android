@@ -22,6 +22,8 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements CardAdapter.OnCardClickListener {
 
+    public static final String EXTRA_TARGET_CARD_NO = "target_card_no";
+
     private HomeViewModel viewModel;
     private CardAdapter adapter;
     private CardDragCoordinator dragCoordinator;
@@ -85,12 +87,35 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
                 binding.layoutEmptyState.setVisibility(View.GONE);
                 binding.rvCards.setVisibility(View.VISIBLE);
                 adapter.submitList(cards);
+                handleTargetCard(getIntent());
             }
 
             if (resource.isError() && resource.message != null) {
                 showError(resource.message);
             }
         });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleTargetCard(intent);
+    }
+
+    private void handleTargetCard(Intent intent) {
+        if (intent == null || adapter == null) return;
+        String targetNo = intent.getStringExtra(EXTRA_TARGET_CARD_NO);
+        if (targetNo != null && !targetNo.trim().isEmpty()) {
+            List<CardEntity> currentCards = adapter.getCards();
+            for (int i = 0; i < currentCards.size(); i++) {
+                if (targetNo.equals(currentCards.get(i).getCardNo())) {
+                    final int position = i;
+                    binding.rvCards.post(() -> binding.rvCards.smoothScrollToPosition(position));
+                    break;
+                }
+            }
+        }
     }
 
     @Override

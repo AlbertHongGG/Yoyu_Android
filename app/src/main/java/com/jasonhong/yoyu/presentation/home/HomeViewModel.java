@@ -1,8 +1,10 @@
 package com.jasonhong.yoyu.presentation.home;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import com.jasonhong.yoyu.presentation.widget.CardAppWidgetProvider;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -55,7 +57,10 @@ public class HomeViewModel extends AndroidViewModel {
                     // Silently refresh balances from network if there are cards
                     if (localCards != null && !localCards.isEmpty()) {
                         cardRepository.refreshCardsBalance(localCards)
-                                .thenAccept(updatedCards -> cardsLiveData.postValue(Resource.success(updatedCards)))
+                                .thenAccept(updatedCards -> {
+                                    cardsLiveData.postValue(Resource.success(updatedCards));
+                                    notifyWidgetDataChanged();
+                                })
                                 .exceptionally(throwable -> null);
                     }
                 })
@@ -69,7 +74,10 @@ public class HomeViewModel extends AndroidViewModel {
     public void refresh() {
         cardRepository.loadCards()
                 .thenCompose(cardRepository::refreshCardsBalance)
-                .thenAccept(updatedCards -> cardsLiveData.postValue(Resource.success(updatedCards)))
+                .thenAccept(updatedCards -> {
+                    cardsLiveData.postValue(Resource.success(updatedCards));
+                    notifyWidgetDataChanged();
+                })
                 .exceptionally(throwable -> {
                     String msg = throwable.getCause() != null ? throwable.getCause().getMessage() : throwable.getMessage();
                     cardsLiveData.postValue(Resource.error(msg != null ? msg : "更新失敗", null));
@@ -81,6 +89,7 @@ public class HomeViewModel extends AndroidViewModel {
         cardRepository.addCard(cardNo, cardName)
                 .thenAccept(newCard -> {
                     cardRepository.loadCards().thenAccept(list -> cardsLiveData.postValue(Resource.success(list)));
+                    notifyWidgetDataChanged();
                     if (callback != null) {
                         mainHandler.post(() -> callback.onSuccess(newCard));
                     }
@@ -98,7 +107,10 @@ public class HomeViewModel extends AndroidViewModel {
     public void deleteCard(String cardNo) {
         cardRepository.removeCard(cardNo)
                 .thenCompose(v -> cardRepository.loadCards())
-                .thenAccept(remainingCards -> cardsLiveData.postValue(Resource.success(remainingCards)))
+                .thenAccept(remainingCards -> {
+                    cardsLiveData.postValue(Resource.success(remainingCards));
+                    notifyWidgetDataChanged();
+                })
                 .exceptionally(throwable -> null);
     }
 
@@ -113,6 +125,15 @@ public class HomeViewModel extends AndroidViewModel {
                     }
                     cardRepository.saveCards(cards).join();
                     cardsLiveData.postValue(Resource.success(cards));
+                    notifyWidgetDataChanged();
                 });
+    }
+
+    private void notifyWidgetDataChanged() {
+        try {
+            Intent intent = new Intent(CardAppWidgetProvider.ACTION_CARD_DATA_CHANGED);
+            intent.setPackage(getApplication().getPackageName());
+            getApplication().sendBroadcast(intent);
+        } catch (Exception ignored) {}
     }
 }

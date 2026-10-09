@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widgetRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_rounded">
+
+    <!-- 100% Full-bleed Card Face Cover (Rotated 90 degrees CenterCrop) -->
+    <ImageView
+        android:id="@+id/ivWidgetCardFace"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/app_logo" />
+
+    <!-- Subtle Bottom Text Protection Scrim -->
+    <ImageView
+        android:id="@+id/viewWidgetScrim"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
+        android:src="@drawable/bg_widget_scrim"
+        android:scaleType="fitXY" />
+
+    <!-- Multi-card Page Indicator (Visible when user has >1 cards, e.g. "1/3") -->
+    <TextView
+        android:id="@+id/tvWidgetIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:shadowColor="#80000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="3"
+        android:textColor="#B3FFFFFF"
+        android:textSize="11sp"
+        android:visibility="gone"
+        tools:text="1/3"
+        tools:visibility="visible" />
+
+    <!-- Bottom Floating Metadata Overlay -->
+    <LinearLayout
+        android:id="@+id/layoutBottomOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="14dp">
+
+        <!-- Bottom-Left: Card Name & Card Number (Tap to open App) -->
+        <LinearLayout
+            android:id="@+id/layoutCardInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvWidgetCardName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:shadowColor="#B3000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:text="我的卡片" />
+
+            <TextView
+                android:id="@+id/tvWidgetCardNo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.03"
+                android:shadowColor="#B3000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="3"
+                android:textColor="#EAFFFFFF"
+                android:textSize="12sp"
+                android:text="一卡通" />
+
+        </LinearLayout>
+
+        <!-- Bottom-Right: Large Bold Balance (Tap to refresh balance) -->
+        <TextView
+            android:id="@+id/tvWidgetBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:fontFamily="sans-serif"
+            android:gravity="end|bottom"
+            android:includeFontPadding="false"
+            android:shadowColor="#B3000000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="5"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:text="$---" />
+
+    </LinearLayout>
+
+</FrameLayout>

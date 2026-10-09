@@ -40,6 +40,22 @@
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.Yoyu.SwipeBack" />
 
+        <!-- 4x2 Home Screen App Widget -->
+        <receiver
+            android:name=".presentation.widget.CardAppWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="com.jasonhong.yoyu.ACTION_CYCLE_CARD" />
+                <action android:name="com.jasonhong.yoyu.ACTION_REFRESH_BALANCE" />
+                <action android:name="com.jasonhong.yoyu.ACTION_CARD_DATA_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_card_4x2_info" />
+        </receiver>
+
     </application>
 
 </manifest>
