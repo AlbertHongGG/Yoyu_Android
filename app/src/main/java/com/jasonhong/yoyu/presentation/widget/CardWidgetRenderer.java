@@ -12,11 +12,10 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.Rotate;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.jasonhong.yoyu.R;
+import com.jasonhong.yoyu.core.navigation.AppLaunchPayload;
 import com.jasonhong.yoyu.domain.model.CardEntity;
-import com.jasonhong.yoyu.presentation.home.MainActivity;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -79,14 +78,7 @@ public class CardWidgetRenderer {
         views.setTextViewText(R.id.tvWidgetBalance, "$0");
         views.setViewVisibility(R.id.tvWidgetIndicator, View.GONE);
 
-        Intent launchIntent = new Intent(context, MainActivity.class);
-        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pi = PendingIntent.getActivity(
-                context,
-                appWidgetId,
-                launchIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        PendingIntent pi = AppLaunchPayload.createWidgetEmptyLaunchPendingIntent(context, appWidgetId);
         views.setOnClickPendingIntent(R.id.widgetRoot, pi);
     }
 
@@ -131,14 +123,10 @@ public class CardWidgetRenderer {
             views.setOnClickPendingIntent(R.id.ivWidgetCardFace, cyclePi);
             views.setOnClickPendingIntent(R.id.viewWidgetScrim, cyclePi);
         } else {
-            Intent launchIntent = new Intent(context, MainActivity.class);
-            launchIntent.putExtra(MainActivity.EXTRA_TARGET_CARD_NO, card.getCardNo());
-            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent launchPi = PendingIntent.getActivity(
+            PendingIntent launchPi = AppLaunchPayload.createWidgetCardLaunchPendingIntent(
                     context,
                     appWidgetId,
-                    launchIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                    card.getCardNo()
             );
             views.setOnClickPendingIntent(R.id.widgetRoot, launchPi);
             views.setOnClickPendingIntent(R.id.ivWidgetCardFace, launchPi);
@@ -146,14 +134,10 @@ public class CardWidgetRenderer {
         }
 
         // Zone B: Bottom-Left Card Info Tap (Name & ID) -> Open App & Focus on this Card
-        Intent cardInfoIntent = new Intent(context, MainActivity.class);
-        cardInfoIntent.putExtra(MainActivity.EXTRA_TARGET_CARD_NO, card.getCardNo());
-        cardInfoIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent cardInfoPi = PendingIntent.getActivity(
+        PendingIntent cardInfoPi = AppLaunchPayload.createWidgetCardLaunchPendingIntent(
                 context,
                 appWidgetId * 100 + 1,
-                cardInfoIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                card.getCardNo()
         );
         views.setOnClickPendingIntent(R.id.layoutCardInfo, cardInfoPi);
 

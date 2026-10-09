@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.base.BaseActivity;
 import com.jasonhong.yoyu.databinding.ActivityMainBinding;
+import com.jasonhong.yoyu.core.navigation.AppLaunchPayload;
 import com.jasonhong.yoyu.domain.model.CardEntity;
 import com.jasonhong.yoyu.presentation.cardface.CardFacePickerActivity;
 import com.jasonhong.yoyu.presentation.detail.CardDetailActivity;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> implements CardAdapter.OnCardClickListener {
 
-    public static final String EXTRA_TARGET_CARD_NO = "target_card_no";
+    public static final String EXTRA_TARGET_CARD_NO = AppLaunchPayload.EXTRA_TARGET_CARD_NO;
 
     private HomeViewModel viewModel;
     private CardAdapter adapter;
@@ -105,11 +106,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements C
 
     private void handleTargetCard(Intent intent) {
         if (intent == null || adapter == null) return;
-        String targetNo = intent.getStringExtra(EXTRA_TARGET_CARD_NO);
-        if (targetNo != null && !targetNo.trim().isEmpty()) {
+        AppLaunchPayload payload = AppLaunchPayload.fromIntent(intent);
+        if (payload.hasTargetCard()) {
+            String targetNo = payload.getTargetCardNo();
             List<CardEntity> currentCards = adapter.getCards();
             for (int i = 0; i < currentCards.size(); i++) {
-                if (targetNo.equals(currentCards.get(i).getCardNo())) {
+                if (targetNo != null && targetNo.equals(currentCards.get(i).getCardNo())) {
                     final int position = i;
                     binding.rvCards.post(() -> binding.rvCards.smoothScrollToPosition(position));
                     break;
