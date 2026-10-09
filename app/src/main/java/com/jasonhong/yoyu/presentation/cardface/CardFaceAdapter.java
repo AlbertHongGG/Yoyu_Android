@@ -47,17 +47,17 @@ public class CardFaceAdapter extends RecyclerView.Adapter<CardFaceAdapter.CardFa
 
     private final Context context;
     private final List<CardFaceItem> items = new ArrayList<>();
-    private final String selectedUrl;
+    private final int selectedFaceId;
     private final OnCardFaceClickListener listener;
     private final ColorDrawable placeholderDrawable = new ColorDrawable(Color.parseColor("#14000000"));
     private final ColorDrawable errorDrawable = new ColorDrawable(Color.parseColor("#22888888"));
 
     private final ViewPreloadSizeProvider<CardFaceItem> sizeProvider;
 
-    public CardFaceAdapter(Context context, String selectedUrl, OnCardFaceClickListener listener,
+    public CardFaceAdapter(Context context, int selectedFaceId, OnCardFaceClickListener listener,
                            ViewPreloadSizeProvider<CardFaceItem> sizeProvider) {
         this.context = context;
-        this.selectedUrl = selectedUrl != null ? selectedUrl : "";
+        this.selectedFaceId = selectedFaceId;
         this.listener = listener;
         this.sizeProvider = sizeProvider;
     }
@@ -139,7 +139,7 @@ public class CardFaceAdapter extends RecyclerView.Adapter<CardFaceAdapter.CardFa
 
         void bind(CardFaceItem item) {
             Context ctx = itemView.getContext();
-            boolean isSelected = item.getUrl().equals(selectedUrl);
+            boolean isSelected = item.getId() == selectedFaceId;
             binding.layoutSelectedOverlay.setVisibility(isSelected ? View.VISIBLE : View.GONE);
 
             binding.tvCardFaceId.setText(item.getFormattedId());

@@ -2,10 +2,13 @@ package com.jasonhong.yoyu.domain.model;
 
 import androidx.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
-import com.jasonhong.yoyu.core.constants.AppConstants;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Pure domain card entity where card cover is modeled strictly as an integer cardFaceId,
+ * referencing CardFaceCatalog as the single source of truth.
+ */
 public class CardEntity implements Serializable {
 
     @SerializedName("cardNo")
@@ -14,8 +17,12 @@ public class CardEntity implements Serializable {
     @SerializedName("cardName")
     private final String cardName;
 
+    @SerializedName("cardFaceId")
+    private final int cardFaceId;
+
+    // Gracefully deserializes legacy records where cardFaceUrl was saved as a string
     @SerializedName("cardFaceUrl")
-    private final String cardFaceUrl;
+    private final String legacyCardFaceUrl;
 
     @SerializedName("lastTranSum")
     private final double lastTranSum;
@@ -26,13 +33,29 @@ public class CardEntity implements Serializable {
     public CardEntity(
             @NonNull String cardNo,
             String cardName,
-            String cardFaceUrl,
+            int cardFaceId,
             double lastTranSum,
             boolean isRegister
     ) {
         this.cardNo = Objects.requireNonNull(cardNo, "cardNo must not be null");
         this.cardName = (cardName != null && !cardName.trim().isEmpty()) ? cardName.trim() : "我的卡片";
-        this.cardFaceUrl = (cardFaceUrl != null && !cardFaceUrl.trim().isEmpty()) ? cardFaceUrl.trim() : AppConstants.DEFAULT_CARD_FACE_URL;
+        this.cardFaceId = CardFaceCatalog.normalize(cardFaceId);
+        this.legacyCardFaceUrl = null;
+        this.lastTranSum = lastTranSum;
+        this.isRegister = isRegister;
+    }
+
+    public CardEntity(
+            @NonNull String cardNo,
+            String cardName,
+            String cardFaceUrlOrId,
+            double lastTranSum,
+            boolean isRegister
+    ) {
+        this.cardNo = Objects.requireNonNull(cardNo, "cardNo must not be null");
+        this.cardName = (cardName != null && !cardName.trim().isEmpty()) ? cardName.trim() : "我的卡片";
+        this.cardFaceId = CardFaceCatalog.resolveFromUrl(cardFaceUrlOrId);
+        this.legacyCardFaceUrl = null;
         this.lastTranSum = lastTranSum;
         this.isRegister = isRegister;
     }
@@ -47,9 +70,23 @@ public class CardEntity implements Serializable {
         return cardName;
     }
 
+    public int getCardFaceId() {
+        if (cardFaceId != 0 && CardFaceCatalog.isValid(cardFaceId)) {
+            return cardFaceId;
+        }
+        if (legacyCardFaceUrl != null && !legacyCardFaceUrl.trim().isEmpty()) {
+            return CardFaceCatalog.resolveFromUrl(legacyCardFaceUrl);
+        }
+        return CardFaceCatalog.DEFAULT_FACE_ID;
+    }
+
     @NonNull
     public String getCardFaceUrl() {
-        return cardFaceUrl;
+        return CardFaceCatalog.getUrl(getCardFaceId());
+    }
+
+    public boolean isDefaultFace() {
+        return getCardFaceId() == CardFaceCatalog.DEFAULT_FACE_ID;
     }
 
     public double getLastTranSum() {
@@ -61,22 +98,22 @@ public class CardEntity implements Serializable {
     }
 
     public CardEntity copyWithCardName(String newCardName) {
-        return new CardEntity(this.cardNo, newCardName, this.cardFaceUrl, this.lastTranSum, this.isRegister);
+        return new CardEntity(this.cardNo, newCardName, getCardFaceId(), this.lastTranSum, this.isRegister);
     }
 
-    public CardEntity copyWithCardFaceUrl(String newCardFaceUrl) {
-        return new CardEntity(this.cardNo, this.cardName, newCardFaceUrl, this.lastTranSum, this.isRegister);
+    public CardEntity copyWithCardFaceId(int newCardFaceId) {
+        return new CardEntity(this.cardNo, this.cardName, newCardFaceId, this.lastTranSum, this.isRegister);
     }
 
     public CardEntity copyWithBalance(double newBalance) {
-        return new CardEntity(this.cardNo, this.cardName, this.cardFaceUrl, newBalance, this.isRegister);
+        return new CardEntity(this.cardNo, this.cardName, getCardFaceId(), newBalance, this.isRegister);
     }
 
-    public CardEntity copyWith(String newCardName, String newCardFaceUrl, double newBalance, boolean newIsRegister) {
+    public CardEntity copyWith(String newCardName, int newCardFaceId, double newBalance, boolean newIsRegister) {
         return new CardEntity(
                 this.cardNo,
                 newCardName != null ? newCardName : this.cardName,
-                newCardFaceUrl != null ? newCardFaceUrl : this.cardFaceUrl,
+                newCardFaceId,
                 newBalance,
                 newIsRegister
         );
@@ -91,12 +128,12 @@ public class CardEntity implements Serializable {
                 isRegister == that.isRegister &&
                 cardNo.equals(that.cardNo) &&
                 cardName.equals(that.cardName) &&
-                cardFaceUrl.equals(that.cardFaceUrl);
+                getCardFaceId() == that.getCardFaceId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cardNo, cardName, cardFaceUrl, lastTranSum, isRegister);
+        return Objects.hash(cardNo, cardName, getCardFaceId(), lastTranSum, isRegister);
     }
 
     @NonNull
@@ -105,7 +142,7 @@ public class CardEntity implements Serializable {
         return "CardEntity{" +
                 "cardNo='" + cardNo + '\'' +
                 ", cardName='" + cardName + '\'' +
-                ", cardFaceUrl='" + cardFaceUrl + '\'' +
+                ", cardFaceId=" + getCardFaceId() +
                 ", lastTranSum=" + lastTranSum +
                 ", isRegister=" + isRegister +
                 '}';

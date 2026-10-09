@@ -20,11 +20,11 @@ import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader;
 import com.bumptech.glide.util.ViewPreloadSizeProvider;
 import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.base.BaseActivity;
-import com.jasonhong.yoyu.core.constants.AppConstants;
 import com.jasonhong.yoyu.data.repository.CardFaceFavoriteRepositoryImpl;
 import com.jasonhong.yoyu.data.repository.CardRepositoryImpl;
 import com.jasonhong.yoyu.databinding.ActivityCardFacePickerBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
+import com.jasonhong.yoyu.domain.model.CardFaceCatalog;
 import com.jasonhong.yoyu.domain.model.CardFaceItem;
 import com.jasonhong.yoyu.domain.repository.CardFaceFavoriteRepository;
 import com.jasonhong.yoyu.domain.repository.CardRepository;
@@ -70,7 +70,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
     protected void initView() {
         card = (CardEntity) getIntent().getSerializableExtra("card");
         if (card == null) {
-            card = new CardEntity("77050067379", "我的卡片", AppConstants.DEFAULT_CARD_FACE_URL, 291.0, false);
+            card = new CardEntity("77050067379", "我的卡片", CardFaceCatalog.DEFAULT_FACE_ID, 291.0, false);
         }
 
         cardRepository = new CardRepositoryImpl(this);
@@ -87,7 +87,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
 
         // Preload size provider observes actual view dimensions on layout
         preloadSizeProvider = new ViewPreloadSizeProvider<>();
-        adapter = new CardFaceAdapter(this, card.getCardFaceUrl(), this, preloadSizeProvider);
+        adapter = new CardFaceAdapter(this, card.getCardFaceId(), this, preloadSizeProvider);
         binding.rvCardFaces.setAdapter(adapter);
 
         // Preload ahead by 24 items in the scroll direction
@@ -104,9 +104,9 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
 
     private void loadAllCards() {
         allItems.clear();
-        for (int id : CardFaceConstants.ALLOWED_IMAGE_IDS) {
+        for (int id : CardFaceCatalog.getAllowedIds()) {
             boolean isFav = favoriteRepository.isFavorite(id);
-            allItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", isFav));
+            allItems.add(new CardFaceItem(id, CardFaceCatalog.getUrl(id), isFav));
         }
         adapter.setItems(allItems);
     }
@@ -161,7 +161,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
             Collections.sort(sortedIds);
             List<CardFaceItem> favItems = new ArrayList<>(sortedIds.size());
             for (Integer id : sortedIds) {
-                favItems.add(new CardFaceItem(id, AppConstants.CARD_FACE_CDN_BASE + id + ".webp", true));
+                favItems.add(new CardFaceItem(id, CardFaceCatalog.getUrl(id), true));
             }
             adapter.setItems(favItems);
         }
@@ -170,7 +170,7 @@ public class CardFacePickerActivity extends BaseActivity<ActivityCardFacePickerB
     @Override
     public void onCardFaceClick(CardFaceItem item) {
         triggerHaptic();
-        CardEntity updated = card.copyWithCardFaceUrl(item.getUrl());
+        CardEntity updated = card.copyWithCardFaceId(item.getId());
         cardRepository.updateCard(updated).thenAccept(v -> {
             sendBroadcast(new Intent(CardAppWidgetProvider.ACTION_CARD_DATA_CHANGED).setPackage(getPackageName()));
             runOnUiThread(this::finish);

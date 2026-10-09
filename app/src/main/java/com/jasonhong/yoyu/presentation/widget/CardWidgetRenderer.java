@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.navigation.AppLaunchPayload;
 import com.jasonhong.yoyu.domain.model.CardEntity;
+import com.jasonhong.yoyu.domain.model.CardFaceCatalog;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -83,23 +84,23 @@ public class CardWidgetRenderer {
     }
 
     private void loadCoverBitmap(@NonNull Context context, @NonNull RemoteViews views, @Nullable String url) {
-        if (url == null || url.trim().isEmpty()) return;
-
+        int cornerRadiusPx = Math.round(20 * context.getResources().getDisplayMetrics().density);
+        Bitmap bitmap = null;
         try {
-            int cornerRadiusPx = Math.round(20 * context.getResources().getDisplayMetrics().density);
-            Bitmap bitmap = Glide.with(context.getApplicationContext())
+            String targetUrl = (url != null && !url.trim().isEmpty())
+                    ? url
+                    : CardFaceCatalog.getDefaultUrl();
+            bitmap = Glide.with(context.getApplicationContext())
                     .asBitmap()
-                    .load(url)
+                    .load(targetUrl)
                     .transform(new CenterCrop(), new RoundedCorners(cornerRadiusPx))
                     .override(640, 400)
                     .submit()
                     .get(3500, TimeUnit.MILLISECONDS);
+        } catch (Exception ignored) {}
 
-            if (bitmap != null) {
-                views.setImageViewBitmap(R.id.ivWidgetCardFace, bitmap);
-            }
-        } catch (Exception ignored) {
-            // Graceful fallback: layout displays default dark gradient background
+        if (bitmap != null) {
+            views.setImageViewBitmap(R.id.ivWidgetCardFace, bitmap);
         }
     }
 

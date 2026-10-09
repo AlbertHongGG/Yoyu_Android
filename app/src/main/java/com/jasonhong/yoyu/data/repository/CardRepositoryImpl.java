@@ -2,7 +2,6 @@ package com.jasonhong.yoyu.data.repository;
 
 import android.content.Context;
 
-import com.jasonhong.yoyu.core.constants.AppConstants;
 import com.jasonhong.yoyu.core.network.ApiException;
 import com.jasonhong.yoyu.core.network.RetrofitClient;
 import com.jasonhong.yoyu.data.api.IPassApiService;
@@ -12,6 +11,7 @@ import com.jasonhong.yoyu.data.model.remote.CheckMyCardsResponse;
 import com.jasonhong.yoyu.domain.model.BatchCardOperationResult;
 import com.jasonhong.yoyu.domain.model.BatchCardSequenceGenerator;
 import com.jasonhong.yoyu.domain.model.CardEntity;
+import com.jasonhong.yoyu.domain.model.CardFaceCatalog;
 import com.jasonhong.yoyu.domain.repository.BatchProgressListener;
 import com.jasonhong.yoyu.domain.repository.CardRepository;
 
@@ -72,10 +72,11 @@ public class CardRepositoryImpl implements CardRepository {
                     throw new ApiException(msg);
                 }
 
+                int faceId = CardFaceCatalog.resolveFromRemote(dto.getCardFaceId());
                 return new CardEntity(
                         dto.getCardNo(),
                         "我的卡片",
-                        AppConstants.DEFAULT_CARD_FACE_URL,
+                        faceId,
                         dto.getLastTranSum(),
                         dto.isRegister()
                 );
@@ -110,7 +111,7 @@ public class CardRepositoryImpl implements CardRepository {
                     CardEntity freshCard = checkCard(card.getCardNo()).join();
                     updatedList.add(freshCard.copyWith(
                             card.getCardName(),
-                            card.getCardFaceUrl(),
+                            card.getCardFaceId(),
                             freshCard.getLastTranSum(),
                             freshCard.isRegister()
                     ));
@@ -210,13 +211,11 @@ public class CardRepositoryImpl implements CardRepository {
                             for (String cardNo : chunk) {
                                 CheckMyCardsResponse.CardDataDto dto = dtoMap.get(cardNo);
                                 if (dto != null && "0".equals(dto.getErrCode())) {
-                                    String faceUrl = (dto.getCardImageUrl() != null && !dto.getCardImageUrl().isEmpty())
-                                            ? dto.getCardImageUrl()
-                                            : AppConstants.DEFAULT_CARD_FACE_URL;
+                                    int faceId = CardFaceCatalog.resolveFromRemote(dto.getCardFaceId());
                                     CardEntity entity = new CardEntity(
                                             dto.getCardNo(),
                                             "我的卡片",
-                                            faceUrl,
+                                            faceId,
                                             dto.getLastTranSum(),
                                             dto.isRegister()
                                     );

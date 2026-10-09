@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable;
 import com.jasonhong.yoyu.databinding.ItemCardBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
@@ -60,11 +61,14 @@ public class CardDragOverlayView extends FrameLayout {
         floatingBinding.btnChangeCover.setVisibility(View.GONE);
 
         // Load Card Face
+        com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable placeholder =
+                new com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable(getContext(), 0f);
         Glide.with(getContext())
                 .load(card.getCardFaceUrl())
                 .transition(DrawableTransitionOptions.withCrossFade(150))
                 .centerCrop()
-                .placeholder(new com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable(getContext(), 0f))
+                .placeholder(placeholder)
+                .error(placeholder)
                 .into(floatingBinding.ivCardFace);
 
         int sourceWidth = sourceItemView.getWidth();

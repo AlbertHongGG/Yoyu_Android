@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.jasonhong.yoyu.R;
 import com.jasonhong.yoyu.core.widgets.skeleton.SkeletonPulseDrawable;
 import com.jasonhong.yoyu.databinding.ItemCardBinding;
 import com.jasonhong.yoyu.domain.model.CardEntity;
@@ -113,7 +114,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                     .transition(DrawableTransitionOptions.withCrossFade(200))
                     .centerCrop()
                     .placeholder(placeholder)
-                    .error(new ColorDrawable(android.graphics.Color.parseColor("#33888888")))
+                    .error(placeholder)
                     .into(binding.ivCardFace);
 
             binding.cardContainer.setOnClickListener(v -> {

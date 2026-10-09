@@ -143,12 +143,12 @@ public class HomeViewModel extends AndroidViewModel {
                 .exceptionally(throwable -> null);
     }
 
-    public void updateCardFace(String cardNo, String newFaceUrl) {
+    public void updateCardFace(String cardNo, int newFaceId) {
         cardRepository.loadCards()
                 .thenAccept(cards -> {
                     for (int i = 0; i < cards.size(); i++) {
                         if (cards.get(i).getCardNo().equals(cardNo)) {
-                            cards.set(i, cards.get(i).copyWithCardFaceUrl(newFaceUrl));
+                            cards.set(i, cards.get(i).copyWithCardFaceId(newFaceId));
                             break;
                         }
                     }

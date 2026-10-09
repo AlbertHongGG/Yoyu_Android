@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Pure persistence storage adhering to CQS (zero read side-effects, zero magic string hacks).
+ */
 public class LocalCardStorage {
 
     private static final String PREF_NAME = "yoyu_prefs";
@@ -49,7 +52,6 @@ public class LocalCardStorage {
 
     public synchronized void addCard(CardEntity card) {
         List<CardEntity> current = getCards();
-        // check if duplicate
         for (int i = 0; i < current.size(); i++) {
             if (current.get(i).getCardNo().equals(card.getCardNo())) {
                 current.set(i, card);
@@ -62,20 +64,13 @@ public class LocalCardStorage {
     }
 
     public synchronized void updateCard(CardEntity card) {
-        List<CardEntity> current = getCards();
-        for (int i = 0; i < current.size(); i++) {
-            if (current.get(i).getCardNo().equals(card.getCardNo())) {
-                current.set(i, card);
-                saveCards(current);
-                return;
-            }
-        }
+        addCard(card);
     }
 
     public synchronized void deleteCard(String cardNo) {
         List<CardEntity> current = getCards();
-        boolean changed = current.removeIf(c -> c.getCardNo().equals(cardNo));
-        if (changed) {
+        boolean removed = current.removeIf(c -> c.getCardNo().equals(cardNo));
+        if (removed) {
             saveCards(current);
         }
     }
