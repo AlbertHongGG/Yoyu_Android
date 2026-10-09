@@ -138,7 +138,7 @@ public class Tilt3DCardView extends FrameLayout {
         setRotationX(targetRotX);
         setRotationY(targetRotY);
 
-        sheenOverlay.setTilt(normRoll, normPitch);
+        sheenOverlay.setTilt(normRoll, -normPitch);
     }
 
     private void updateSheenFromCurrentRotation() {
